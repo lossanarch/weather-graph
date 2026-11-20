@@ -1,0 +1,23 @@
+{
+  "name": "weather-graph-card",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 43120",
+    "build": "tsc --noEmit && vite build",
+    "build:card": "tsc --noEmit && vite build --config vite.card.config.ts",
+    "build:all": "npm run build:card && npm run build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "lit": "^3.2.1"
+  },
+  "devDependencies": {
+    "happy-dom": "^15.11.7",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vitest": "^2.1.8"
+  }
+}
