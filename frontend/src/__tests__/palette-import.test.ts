@@ -8,7 +8,7 @@ import {
   paletteToCsv,
   parsePaletteInput,
 } from "../theme/palette-import";
-import type { WeatherGraphCardConfig } from "../types";
+import type { HomeAssistant, WeatherGraphCardConfig } from "../types";
 
 const PASTEL = ["#c7eae4", "#a7e8bd", "#fcbcb8", "#efa7a7", "#ffd972"];
 const CURRENT = resolvePalette("dusk", undefined);
@@ -158,8 +158,9 @@ describe("assignPaletteColors", () => {
 });
 
 describe("editor palette tools", () => {
-  async function mountEditor(config: Partial<WeatherGraphCardConfig> = {}) {
+  async function mountEditor(config: Partial<WeatherGraphCardConfig> = {}, darkMode = true) {
     const editor = document.createElement("weather-graph-card-editor") as WeatherGraphCardEditor;
+    editor.hass = { states: {}, themes: { darkMode } } as unknown as HomeAssistant;
     editor.setConfig({ type: "custom:weather-graph-card", ...config });
     document.body.appendChild(editor);
     await editor.updateComplete;
@@ -223,6 +224,47 @@ describe("editor palette tools", () => {
       rain: midnight.temperature,
     });
     expect(root.querySelector(".swatch.selected")).toBeNull();
+    editor.remove();
+  });
+
+  it("edits the light palette without touching the dark one", async () => {
+    const { editor, root, changes } = await mountEditor(
+      { palette: "midnight", colors: { rain: "#123456" } },
+      true
+    );
+    expect(root.querySelector('.mode-btn[aria-pressed="true"]')?.getAttribute("data-mode")).toBe(
+      "dark"
+    );
+    expect(root.querySelector<HTMLSelectElement>("#wg-palette")!.value).toBe("midnight");
+
+    root.querySelector<HTMLButtonElement>('.mode-btn[data-mode="light"]')!.click();
+    await editor.updateComplete;
+    const select = root.querySelector<HTMLSelectElement>("#wg-palette")!;
+    expect(select.value).toBe("daylight");
+    expect(select.selectedOptions[0].textContent).toContain("(default)");
+
+    select.value = "forest";
+    select.dispatchEvent(new Event("change"));
+    await editor.updateComplete;
+    const input = root.querySelector<HTMLInputElement>("#wg-color-wind")!;
+    input.value = "#abcdef";
+    input.dispatchEvent(new Event("input"));
+    await editor.updateComplete;
+
+    expect(changes.at(-1)).toMatchObject({
+      palette: "midnight",
+      colors: { rain: "#123456" },
+      light_palette: "forest",
+      light_colors: { wind: "#abcdef" },
+    });
+    editor.remove();
+  });
+
+  it("starts on the light palette when Home Assistant is in light mode", async () => {
+    const { editor, root } = await mountEditor({}, false);
+    expect(root.querySelector('.mode-btn[aria-pressed="true"]')?.getAttribute("data-mode")).toBe(
+      "light"
+    );
     editor.remove();
   });
 

@@ -45,6 +45,7 @@ function createSimulatedHass(): HomeAssistant {
 
   return {
     states,
+    themes: { darkMode: true },
     config: {
       time_zone: "Australia/Sydney",
       unit_system: {
@@ -92,12 +93,14 @@ export class WgPreviewWorkbench extends LitElement {
     _activeProfileId: { state: true },
     _cardConfig: { state: true },
     _cardWidth: { state: true },
+    _darkMode: { state: true },
   };
 
   declare private _hass: HomeAssistant;
   declare private _activeProfileId: string;
   declare private _cardConfig: WeatherGraphCardConfig;
   declare private _cardWidth: number | null;
+  declare private _darkMode: boolean;
 
   constructor() {
     super();
@@ -115,6 +118,7 @@ export class WgPreviewWorkbench extends LitElement {
       show_location: false,
     };
     this._cardWidth = null;
+    this._darkMode = true;
   }
 
   static styles = css`
@@ -320,6 +324,13 @@ export class WgPreviewWorkbench extends LitElement {
     if (colors.length) {
       lines.push(`colors:\n${colors.map(([k, v]) => `  ${k}: "${v}"`).join("\n")}`);
     }
+    if (this._cardConfig.light_palette) {
+      lines.push(`light_palette: ${this._cardConfig.light_palette}`);
+    }
+    const lightColors = Object.entries(this._cardConfig.light_colors ?? {});
+    if (lightColors.length) {
+      lines.push(`light_colors:\n${lightColors.map(([k, v]) => `  ${k}: "${v}"`).join("\n")}`);
+    }
     return lines.join("\n");
   }
 
@@ -373,6 +384,23 @@ export class WgPreviewWorkbench extends LitElement {
                     class="profile-pill ${this._cardWidth === opt.width ? "active" : ""}"
                     @click=${() => {
                       this._cardWidth = opt.width;
+                    }}
+                  >
+                    ${opt.label}
+                  </button>
+                `
+              )}
+              ${[
+                { label: "Dark mode", dark: true },
+                { label: "Light mode", dark: false },
+              ].map(
+                (opt) => html`
+                  <button
+                    type="button"
+                    class="profile-pill ${this._darkMode === opt.dark ? "active" : ""}"
+                    @click=${() => {
+                      this._darkMode = opt.dark;
+                      this._hass = { ...this._hass, themes: { darkMode: opt.dark } };
                     }}
                   >
                     ${opt.label}

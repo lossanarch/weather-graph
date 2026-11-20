@@ -1,6 +1,5 @@
 import { LitElement, type PropertyDeclarations, css, html } from "lit";
 import {
-  DEFAULT_PALETTE_ID,
   PALETTE_PRESETS,
   PALETTE_SLOTS,
   type PaletteColors,
@@ -8,6 +7,8 @@ import {
   contrastRatio,
   effectiveOverrides,
   getPalettePreset,
+  modePaletteSelection,
+  type PaletteMode,
   resolvePalette,
 } from "../theme/palette";
 import { assignPaletteColors, paletteToCsv, parsePaletteInput } from "../theme/palette-import";
@@ -48,6 +49,7 @@ export class WeatherGraphCardEditor extends LitElement {
     _pasteNote: { state: true },
     _drag: { state: true },
     _tapSlot: { state: true },
+    _paletteMode: { state: true },
   };
 
   declare hass?: HomeAssistant;
@@ -56,6 +58,7 @@ export class WeatherGraphCardEditor extends LitElement {
   declare private _pasteNote?: { kind: "error" | "success"; text: string };
   declare private _drag?: SwatchDrag;
   declare private _tapSlot?: PaletteSlot;
+  declare private _paletteMode?: PaletteMode;
 
   constructor() {
     super();
@@ -261,6 +264,33 @@ export class WeatherGraphCardEditor extends LitElement {
       cursor: pointer;
     }
 
+    .mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 3px;
+      gap: 3px;
+      border-radius: 10px;
+      border: 1px solid var(--divider-color, rgba(148, 163, 184, 0.3));
+    }
+
+    .mode-btn {
+      appearance: none;
+      border: 0;
+      border-radius: 7px;
+      padding: 6px 10px;
+      background: transparent;
+      color: var(--secondary-text-color, #94a3b8);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .mode-btn[aria-pressed="true"] {
+      background: var(--primary-color, #03a9f4);
+      color: var(--text-primary-color, #ffffff);
+    }
+
     .paste-box {
       display: flex;
       flex-direction: column;
@@ -364,23 +394,46 @@ export class WeatherGraphCardEditor extends LitElement {
     this._update("metrics", next);
   }
 
+  /** The mode being edited; starts on whichever mode Home Assistant is showing. */
+  private get _mode(): PaletteMode {
+    if (this._paletteMode) return this._paletteMode;
+    const dark =
+      this.hass?.themes?.darkMode ??
+      window.matchMedia?.("(prefers-color-scheme: dark)").matches ??
+      true;
+    return dark ? "dark" : "light";
+  }
+
+  private get _selection() {
+    return modePaletteSelection(this._config, this._mode);
+  }
+
+  private _resolvedColors(): PaletteColors {
+    const { paletteId, overrides } = this._selection;
+    return resolvePalette(paletteId, overrides);
+  }
+
+  private _setMode(mode: PaletteMode): void {
+    this._paletteMode = mode;
+    this._tapSlot = undefined;
+    this._pasteNote = undefined;
+  }
+
   private _setPalette(paletteId: string): void {
-    const nextConfig: WeatherGraphCardConfig = { ...this._config, palette: paletteId };
-    delete nextConfig.colors;
+    const { paletteKey, colorsKey } = this._selection;
+    const nextConfig: WeatherGraphCardConfig = { ...this._config, [paletteKey]: paletteId };
+    delete nextConfig[colorsKey];
     this._emit(nextConfig);
   }
 
   private _setColor(slot: PaletteSlot, value: string): void {
-    const overrides = effectiveOverrides(this._config.palette, {
-      ...this._config.colors,
-      [slot]: value,
-    });
-    this._update("colors", Object.keys(overrides).length > 0 ? overrides : undefined);
+    this._applyColors({ ...this._resolvedColors(), [slot]: value });
   }
 
   private _applyColors(colors: PaletteColors): void {
-    const overrides = effectiveOverrides(this._config.palette, colors);
-    this._update("colors", Object.keys(overrides).length > 0 ? overrides : undefined);
+    const { paletteId, colorsKey } = this._selection;
+    const overrides = effectiveOverrides(paletteId, colors);
+    this._update(colorsKey, Object.keys(overrides).length > 0 ? overrides : undefined);
   }
 
   private _applyPaste(): void {
@@ -389,7 +442,7 @@ export class WeatherGraphCardEditor extends LitElement {
       this._pasteNote = { kind: "error", text: parsed.error };
       return;
     }
-    const current = resolvePalette(this._config.palette, this._config.colors);
+    const current = this._resolvedColors();
     const { colors, mode, count } = assignPaletteColors(parsed.input, current);
     this._applyColors(colors);
     this._pasteText = "";
@@ -404,7 +457,7 @@ export class WeatherGraphCardEditor extends LitElement {
   }
 
   private async _copyCurrent(): Promise<void> {
-    const csv = paletteToCsv(resolvePalette(this._config.palette, this._config.colors));
+    const csv = paletteToCsv(this._resolvedColors());
     try {
       await navigator.clipboard.writeText(csv);
       this._pasteNote = { kind: "success", text: "Current palette copied as CSV." };
@@ -419,7 +472,7 @@ export class WeatherGraphCardEditor extends LitElement {
 
   private _swapColors(a: PaletteSlot, b: PaletteSlot): void {
     if (a === b) return;
-    const colors = resolvePalette(this._config.palette, this._config.colors);
+    const colors = this._resolvedColors();
     this._applyColors({ ...colors, [a]: colors[b], [b]: colors[a] });
   }
 
@@ -637,10 +690,12 @@ export class WeatherGraphCardEditor extends LitElement {
   }
 
   private _renderColorsSection() {
-    const preset = getPalettePreset(this._config.palette);
-    const overrides = effectiveOverrides(this._config.palette, this._config.colors);
-    const colors = resolvePalette(this._config.palette, this._config.colors);
+    const { paletteId, defaultId, overrides: rawOverrides, colorsKey } = this._selection;
+    const preset = getPalettePreset(paletteId);
+    const overrides = effectiveOverrides(paletteId, rawOverrides);
+    const colors = this._resolvedColors();
     const hasOverrides = Object.keys(overrides).length > 0;
+    const mode = this._mode;
 
     return html`
       <div class="field">
@@ -650,10 +705,25 @@ export class WeatherGraphCardEditor extends LitElement {
             type="button"
             class="revert-btn"
             ?disabled=${!hasOverrides}
-            @click=${() => this._update("colors", undefined)}
+            @click=${() => this._update(colorsKey, undefined)}
           >
             Revert to ${preset.name}
           </button>
+        </div>
+        <div class="mode-switch" role="group" aria-label="Palette to edit">
+          ${(["dark", "light"] as const).map(
+            (m) => html`
+              <button
+                type="button"
+                class="mode-btn"
+                data-mode=${m}
+                aria-pressed=${m === mode ? "true" : "false"}
+                @click=${() => this._setMode(m)}
+              >
+                ${m === "dark" ? "Dark mode" : "Light mode"}
+              </button>
+            `
+          )}
         </div>
         <select
           id="wg-palette"
@@ -663,7 +733,7 @@ export class WeatherGraphCardEditor extends LitElement {
           ${PALETTE_PRESETS.map(
             (p) => html`
               <option value=${p.id} ?selected=${p.id === preset.id}>
-                ${p.name}${p.id === DEFAULT_PALETTE_ID ? " (default)" : ""}
+                ${p.name}${p.id === defaultId ? " (default)" : ""}
               </option>
             `
           )}
@@ -674,8 +744,10 @@ export class WeatherGraphCardEditor extends LitElement {
           )}
         </div>
         <span class="hint">
-          Pick a built-in palette, then adjust any colour. Drag the handles (or tap two) to swap
-          colours. Changing palette clears custom colours.
+          The card uses the dark palette when Home Assistant is in dark mode (by default it follows
+          your system) and the light palette otherwise. Pick a built-in palette, then adjust any
+          colour. Drag the handles (or tap two) to swap colours. Changing palette clears custom
+          colours.
         </span>
         ${this._renderPasteBox()}
       </div>

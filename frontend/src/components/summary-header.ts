@@ -6,7 +6,7 @@ import {
 } from "../icons/weather-icons";
 import type { CurrentObservation, NormalizedHourPoint, SummaryMetric } from "../types";
 import { formatHeaderDayHour } from "../utils/forecast-utils";
-import { formatSummaryMetric } from "../utils/summary-metrics";
+import { type UvTimes, formatSummaryMetric } from "../utils/summary-metrics";
 
 export interface SummaryHeaderProps {
   point: NormalizedHourPoint;
@@ -14,6 +14,7 @@ export interface SummaryHeaderProps {
   currentObs: CurrentObservation | null;
   timeZone: string;
   metrics: SummaryMetric[];
+  uvTimes?: UvTimes | null;
 }
 
 export function renderSummaryHeader({
@@ -22,6 +23,7 @@ export function renderSummaryHeader({
   currentObs,
   timeZone,
   metrics,
+  uvTimes,
 }: SummaryHeaderProps): TemplateResult {
   const temp =
     isFirstHour && currentObs?.temperature !== null && currentObs?.temperature !== undefined
@@ -65,7 +67,10 @@ export function renderSummaryHeader({
         ? html`
             <div class="wg-summary-metrics">
               ${metrics.map((m) => {
-                const { label, value } = formatSummaryMetric(m, point, isFirstHour, currentObs);
+                const { label, value } = formatSummaryMetric(m, point, isFirstHour, currentObs, {
+                  uvTimes,
+                  timeZone,
+                });
                 return html`
                   <div class="wg-metric-row">
                     <span class="wg-metric-label">${label}</span>

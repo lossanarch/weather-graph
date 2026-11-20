@@ -87,6 +87,45 @@ export const PALETTE_PRESETS: ReadonlyArray<PalettePreset> = [
 ];
 
 export const DEFAULT_PALETTE_ID = "dusk";
+export const DEFAULT_LIGHT_PALETTE_ID = "daylight";
+
+export type PaletteMode = "dark" | "light";
+
+export interface ModePaletteConfig {
+  palette?: string;
+  colors?: Partial<Record<PaletteSlot, string>>;
+  light_palette?: string;
+  light_colors?: Partial<Record<PaletteSlot, string>>;
+}
+
+export interface ModePaletteSelection {
+  paletteKey: "palette" | "light_palette";
+  colorsKey: "colors" | "light_colors";
+  paletteId: string;
+  defaultId: string;
+  overrides: Partial<Record<PaletteSlot, string>> | undefined;
+}
+
+/** Which config keys and preset apply in dark or light mode. */
+export function modePaletteSelection(
+  config: ModePaletteConfig,
+  mode: PaletteMode
+): ModePaletteSelection {
+  const light = mode === "light";
+  const defaultId = light ? DEFAULT_LIGHT_PALETTE_ID : DEFAULT_PALETTE_ID;
+  return {
+    paletteKey: light ? "light_palette" : "palette",
+    colorsKey: light ? "light_colors" : "colors",
+    paletteId: getPalettePreset(light ? config.light_palette : config.palette, defaultId).id,
+    defaultId,
+    overrides: light ? config.light_colors : config.colors,
+  };
+}
+
+export function resolveModePalette(config: ModePaletteConfig, mode: PaletteMode): PaletteColors {
+  const { paletteId, overrides } = modePaletteSelection(config, mode);
+  return resolvePalette(paletteId, overrides);
+}
 
 const HEX_RE = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
 
@@ -101,9 +140,13 @@ export function normalizeHex(value: unknown): string | null {
   return trimmed.toLowerCase();
 }
 
-export function getPalettePreset(id: string | undefined): PalettePreset {
+export function getPalettePreset(
+  id: string | undefined,
+  fallbackId: string = DEFAULT_PALETTE_ID
+): PalettePreset {
   return (
     PALETTE_PRESETS.find((p) => p.id === id) ??
+    PALETTE_PRESETS.find((p) => p.id === fallbackId) ??
     PALETTE_PRESETS.find((p) => p.id === DEFAULT_PALETTE_ID)!
   );
 }

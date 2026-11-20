@@ -7,13 +7,17 @@ export type SummaryMetric =
   | "dew_point"
   | "feels_like"
   | "uv"
+  | "uv_time"
   | "rain_amount";
 
 export interface WeatherGraphCardConfig {
   type: string;
   metrics?: SummaryMetric[];
+  /** Palette used in dark mode. */
   palette?: string;
   colors?: Partial<Record<PaletteSlot, string>>;
+  light_palette?: string;
+  light_colors?: Partial<Record<PaletteSlot, string>>;
   entity?: string;
   bom_entry_id?: string;
   title?: string;
@@ -35,6 +39,14 @@ export interface SunWindow {
   sunrise_ms: number | null;
   sunset: string | null;
   sunset_ms: number | null;
+}
+
+/** BOM sun protection times for one local calendar day. */
+export interface UvWindow {
+  date: string;
+  start_ms: number | null;
+  end_ms: number | null;
+  max_index: number | null;
 }
 
 export interface CurrentObservation {
@@ -84,6 +96,7 @@ export interface NormalizedForecastPayload {
   };
   current: CurrentObservation | null;
   sun_windows: SunWindow[];
+  uv_windows?: UvWindow[];
   hourly: NormalizedHourPoint[];
 }
 
@@ -134,6 +147,7 @@ export interface HomeAssistant {
       accumulated_precipitation?: string;
     };
   };
+  themes?: { darkMode?: boolean };
   connection: HassConnection;
   callWS?: <T>(msg: Record<string, unknown>) => Promise<T>;
 }

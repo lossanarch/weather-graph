@@ -1,5 +1,10 @@
 import type { NormalizedForecastPayload, NormalizedHourPoint } from "../types";
-import { computeDewPointC, normalizeWindBearing } from "../utils/forecast-utils";
+import {
+  computeDewPointC,
+  getLocalHour,
+  localDateKey,
+  normalizeWindBearing,
+} from "../utils/forecast-utils";
 
 interface RawProfileSeed {
   id: string;
@@ -42,6 +47,14 @@ function generatePayload(seed: RawProfileSeed): NormalizedForecastPayload {
     sunset_ms: day0SunsetMs,
   });
 
+  const TEN_MIN = 600_000;
+  const uv_windows = sun_windows.map((w) => ({
+    date: localDateKey(w.sunrise_ms, seed.timezone),
+    start_ms: Math.round((w.sunrise_ms + 2.5 * 3600_000) / TEN_MIN) * TEN_MIN,
+    end_ms: Math.round((w.sunset_ms - 2.7 * 3600_000) / TEN_MIN) * TEN_MIN,
+    max_index: 9,
+  }));
+
   const isNightMs = (ms: number): boolean => {
     for (const win of sun_windows) {
       if (
@@ -81,7 +94,9 @@ function generatePayload(seed: RawProfileSeed): NormalizedForecastPayload {
       icon_descriptor: spec.icon,
       condition: spec.icon === "storm" ? "lightning-rainy" : "partlycloudy",
       is_night: night,
-      uv_index: night ? 0 : Math.max(1, Math.round(9 * Math.sin(((i % 24) / 12) * Math.PI))),
+      uv_index: night
+        ? 0
+        : Math.max(0, Math.round(10 * Math.sin(((getLocalHour(epochMs, seed.timezone) - 6) / 14) * Math.PI))),
     });
   }
 
@@ -111,6 +126,7 @@ function generatePayload(seed: RawProfileSeed): NormalizedForecastPayload {
       rain_since_9am_mm: 1.4,
     },
     sun_windows,
+    uv_windows,
     hourly,
   };
 }

@@ -240,6 +240,39 @@ export function formatHeaderDayHour(epochMs: number, timeZone?: string): string 
   }
 }
 
+/** Local calendar date as YYYY-MM-DD. */
+export function localDateKey(epochMs: number, timeZone?: string): string {
+  try {
+    return new Intl.DateTimeFormat("en-CA", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      ...(timeZone ? { timeZone } : {}),
+    }).format(new Date(epochMs));
+  } catch {
+    const d = new Date(epochMs);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+}
+
+/** Compact 12h clock that drops ":00": "9:10am", "4pm". */
+export function formatShortClock(epochMs: number, timeZone?: string): string {
+  try {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+      ...(timeZone ? { timeZone } : {}),
+    }).formatToParts(new Date(epochMs));
+    const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+    const minute = get("minute");
+    return `${get("hour")}${minute && minute !== "00" ? `:${minute}` : ""}${get("dayPeriod").toLowerCase()}`;
+  } catch {
+    return formatAxisHour(epochMs, timeZone);
+  }
+}
+
 /**
  * Format 3-hourly timeline axis label as compact 12h clock: "3pm", "12am", "6am".
  */

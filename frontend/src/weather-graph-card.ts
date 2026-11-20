@@ -4,7 +4,7 @@ import "./components/forecast-chart";
 import { renderSummaryHeader } from "./components/summary-header";
 import "./editor/weather-graph-card-editor";
 import { renderWindLegendArrowHtml } from "./icons/weather-icons";
-import { buildThemeVars, resolvePalette } from "./theme/palette";
+import { buildThemeVars, resolveModePalette } from "./theme/palette";
 import type {
   CurrentObservation,
   HomeAssistant,
@@ -17,7 +17,7 @@ import {
   normalizeWindBearing,
   resolveWeatherEntityId,
 } from "./utils/forecast-utils";
-import { normalizeSummaryMetrics } from "./utils/summary-metrics";
+import { normalizeSummaryMetrics, resolveUvTimes } from "./utils/summary-metrics";
 
 const CARD_VERSION = "1.2.0";
 
@@ -33,6 +33,7 @@ export class WeatherGraphCard extends LitElement {
     _showWind: { state: true },
     _loading: { state: true },
     _error: { state: true },
+    _prefersDark: { state: true },
   };
 
   declare hass?: HomeAssistant;
@@ -45,6 +46,7 @@ export class WeatherGraphCard extends LitElement {
   declare private _showWind: boolean;
   declare private _loading: boolean;
   declare private _error: string | null;
+  declare private _prefersDark: boolean;
 
   constructor() {
     super();
@@ -64,8 +66,13 @@ export class WeatherGraphCard extends LitElement {
     this._showWind = true;
     this._loading = true;
     this._error = null;
+    this._prefersDark = true;
   }
 
+  private _darkQuery?: MediaQueryList;
+  private readonly _onSchemeChange = (e: MediaQueryListEvent) => {
+    this._prefersDark = e.matches;
+  };
   private _unsubForecast?: () => void;
   private _subscribedKey = "";
   private _subscribing = false;
@@ -388,6 +395,11 @@ export class WeatherGraphCard extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
+    this._darkQuery = window.matchMedia?.("(prefers-color-scheme: dark)");
+    if (this._darkQuery) {
+      this._prefersDark = this._darkQuery.matches;
+      this._darkQuery.addEventListener?.("change", this._onSchemeChange);
+    }
     if (this.samplePayload) {
       this._payload = this.samplePayload;
       this._loading = false;
@@ -397,6 +409,8 @@ export class WeatherGraphCard extends LitElement {
   }
 
   disconnectedCallback(): void {
+    this._darkQuery?.removeEventListener?.("change", this._onSchemeChange);
+    this._darkQuery = undefined;
     this._teardownSubscription();
     super.disconnectedCallback();
   }
@@ -579,9 +593,12 @@ export class WeatherGraphCard extends LitElement {
           }`
         : "";
 
-    const themeVars = buildThemeVars(
-      resolvePalette(this._config.palette, this._config.colors)
-    );
+    // HA's own dark mode follows the system unless the user overrides it in their profile.
+    const dark = this.hass?.themes?.darkMode ?? this._prefersDark;
+    const themeVars = buildThemeVars(resolveModePalette(this._config, dark ? "dark" : "light"));
+    const timeZone =
+      this._payload?.location?.timezone ?? this.hass?.config?.time_zone ?? "Australia/Sydney";
+    const metrics = normalizeSummaryMetrics(this._config.metrics);
 
     return html`
       <div class="wg-card" style=${styleMap(themeVars)}>
@@ -610,19 +627,17 @@ export class WeatherGraphCard extends LitElement {
                   currentObs: this._resolveCurrentObservation(
                     this._payload?.current ?? null
                   ),
-                  timeZone:
-                    this._payload?.location?.timezone ??
-                    this.hass?.config?.time_zone ??
-                    "Australia/Sydney",
-                  metrics: normalizeSummaryMetrics(this._config.metrics),
+                  timeZone,
+                  metrics,
+                  uvTimes: metrics.includes("uv_time")
+                    ? resolveUvTimes(this._payload, selectedPoint.epoch_ms, timeZone)
+                    : null,
                 })}
 
                 <wg-forecast-chart
                   .hours=${hours}
                   .sunWindows=${this._payload?.sun_windows ?? []}
-                  .timeZone=${this._payload?.location?.timezone ??
-                  this.hass?.config?.time_zone ??
-                  "Australia/Sydney"}
+                  .timeZone=${timeZone}
                   .selectedIndex=${this._selectedIndex}
                   .visibleHours=${this._config.visible_hours ?? 24}
                   .showTemperature=${this._showTemperature}
