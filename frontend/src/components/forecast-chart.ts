@@ -26,6 +26,13 @@ const LEFT_GUTTER = 44;
 const RIGHT_GUTTER = 44;
 const INNER_EDGE_PAD = 14;
 
+interface AxisView {
+  unit: string;
+  ticks: number[];
+  tone: "temp" | "wind" | "rain";
+  dim: boolean;
+}
+
 export class WgForecastChart extends LitElement {
   static properties: PropertyDeclarations = {
     hours: { attribute: false },
@@ -89,7 +96,7 @@ export class WgForecastChart extends LitElement {
       width: 100%;
       height: ${SVG_HEIGHT}px;
       overflow: hidden;
-      background: #132334;
+      background: var(--wg-band-night-plot);
     }
 
     .wg-scroll-viewport {
@@ -98,7 +105,7 @@ export class WgForecastChart extends LitElement {
       overflow-x: auto;
       overflow-y: hidden;
       scrollbar-width: thin;
-      scrollbar-color: rgba(148, 179, 209, 0.3) transparent;
+      scrollbar-color: var(--wg-control-border) transparent;
       -webkit-overflow-scrolling: touch;
       cursor: crosshair;
     }
@@ -112,7 +119,7 @@ export class WgForecastChart extends LitElement {
     }
 
     .wg-scroll-viewport::-webkit-scrollbar-thumb {
-      background: rgba(148, 179, 209, 0.28);
+      background: var(--wg-control-border);
       border-radius: 999px;
     }
 
@@ -127,6 +134,23 @@ export class WgForecastChart extends LitElement {
       height: ${SVG_HEIGHT - STRIP_HEIGHT}px;
       pointer-events: none;
       z-index: 3;
+      transition: opacity 0.2s ease;
+    }
+
+    .wg-axis-temp {
+      color: var(--wg-temp);
+    }
+
+    .wg-axis-wind {
+      color: var(--wg-wind);
+    }
+
+    .wg-axis-rain {
+      color: var(--wg-rain);
+    }
+
+    .wg-axis-dim {
+      opacity: 0.35;
     }
 
     .wg-axis-left {
@@ -134,8 +158,8 @@ export class WgForecastChart extends LitElement {
       width: ${LEFT_GUTTER + 8}px;
       background: linear-gradient(
         90deg,
-        rgba(16, 31, 48, 0.92) 62%,
-        rgba(16, 31, 48, 0) 100%
+        var(--wg-axis-fade) 62%,
+        var(--wg-axis-fade-clear) 100%
       );
     }
 
@@ -144,8 +168,8 @@ export class WgForecastChart extends LitElement {
       width: ${RIGHT_GUTTER + 8}px;
       background: linear-gradient(
         270deg,
-        rgba(16, 31, 48, 0.92) 62%,
-        rgba(16, 31, 48, 0) 100%
+        var(--wg-axis-fade) 62%,
+        var(--wg-axis-fade-clear) 100%
       );
     }
 
@@ -160,12 +184,10 @@ export class WgForecastChart extends LitElement {
 
     .wg-axis-left .wg-axis-unit {
       left: 10px;
-      color: #e8b93a;
     }
 
     .wg-axis-right .wg-axis-unit {
       right: 10px;
-      color: #dbe7f3;
     }
 
     .wg-axis-tick {
@@ -179,12 +201,10 @@ export class WgForecastChart extends LitElement {
 
     .wg-axis-left .wg-axis-tick {
       left: 10px;
-      color: #e8b93a;
     }
 
     .wg-axis-right .wg-axis-tick {
       right: 10px;
-      color: #f1f5f9;
     }
 
     .wg-pan-btn {
@@ -193,10 +213,10 @@ export class WgForecastChart extends LitElement {
       z-index: 4;
       width: 26px;
       height: 32px;
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      border: 1px solid var(--wg-control-border);
       border-radius: 6px;
-      background: rgba(9, 21, 37, 0.78);
-      color: #e2e8f0;
+      background: var(--wg-control-bg);
+      color: var(--wg-text);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -212,7 +232,7 @@ export class WgForecastChart extends LitElement {
     }
 
     .wg-pan-btn:hover {
-      background: rgba(18, 40, 66, 0.95);
+      background: var(--wg-panel);
     }
 
     .wg-pan-left {
@@ -236,7 +256,67 @@ export class WgForecastChart extends LitElement {
       font-size: 9.5px;
       font-weight: 700;
       letter-spacing: 0.05em;
-      fill: #93c5fd;
+      fill: var(--wg-day-label);
+    }
+
+    .wg-band-day-strip {
+      fill: var(--wg-band-day-strip);
+    }
+
+    .wg-band-night-strip {
+      fill: var(--wg-band-night-strip);
+    }
+
+    .wg-band-day-plot {
+      fill: var(--wg-band-day-plot);
+    }
+
+    .wg-band-night-plot {
+      fill: var(--wg-band-night-plot);
+    }
+
+    .wg-grid-vertical {
+      stroke: var(--wg-grid-vertical);
+    }
+
+    .wg-grid-horizontal {
+      stroke: var(--wg-grid);
+    }
+
+    .wg-strip-rule {
+      stroke: var(--wg-strip-rule);
+    }
+
+    .wg-hour-label {
+      fill: var(--wg-text);
+    }
+
+    .wg-rain-area {
+      fill: var(--wg-rain-fill);
+    }
+
+    .wg-rain-stroke {
+      stroke: var(--wg-rain-stroke);
+    }
+
+    .wg-temp-line {
+      stroke: var(--wg-temp);
+    }
+
+    .wg-wind-line {
+      stroke: var(--wg-wind-line);
+    }
+
+    .wg-wind-marker {
+      fill: var(--wg-wind);
+    }
+
+    .wg-scrubber-head {
+      fill: var(--wg-text);
+    }
+
+    .wg-scrubber-line {
+      stroke: var(--wg-text);
     }
   `;
 
@@ -505,6 +585,23 @@ export class WgForecastChart extends LitElement {
       return PLOT_BOTTOM - ratio * plotSpanY;
     });
 
+    const rainAxis: AxisView = {
+      unit: "%",
+      ticks: Array.from({ length: scales.gridCount }, (_, idx) =>
+        Math.round((idx * 100) / (scales.gridCount - 1))
+      ),
+      tone: "rain",
+      dim: false,
+    };
+    const rainOnLeft = this.showRain && !this.showTemperature;
+    const rainOnRight = this.showRain && this.showTemperature && !this.showWind;
+    const leftAxis: AxisView = rainOnLeft
+      ? rainAxis
+      : { unit: "°C", ticks: scales.temp.ticks, tone: "temp", dim: !this.showTemperature };
+    const rightAxis: AxisView = rainOnRight
+      ? rainAxis
+      : { unit: "km/h", ticks: scales.wind.ticks, tone: "wind", dim: !this.showWind };
+
     return html`
       <div
         class="wg-chart-shell"
@@ -541,9 +638,14 @@ export class WgForecastChart extends LitElement {
             `
           : nothing}
 
-        <div class="wg-axis-overlay wg-axis-left" aria-hidden="true">
-          <span class="wg-axis-unit">°C</span>
-          ${scales.temp.ticks.map(
+        <div
+          class="wg-axis-overlay wg-axis-left wg-axis-${leftAxis.tone} ${leftAxis.dim
+            ? "wg-axis-dim"
+            : ""}"
+          aria-hidden="true"
+        >
+          <span class="wg-axis-unit">${leftAxis.unit}</span>
+          ${leftAxis.ticks.map(
             (val, idx) => html`
               <span
                 class="wg-axis-tick"
@@ -555,9 +657,14 @@ export class WgForecastChart extends LitElement {
           )}
         </div>
 
-        <div class="wg-axis-overlay wg-axis-right" aria-hidden="true">
-          <span class="wg-axis-unit">km/h</span>
-          ${scales.wind.ticks.map(
+        <div
+          class="wg-axis-overlay wg-axis-right wg-axis-${rightAxis.tone} ${rightAxis.dim
+            ? "wg-axis-dim"
+            : ""}"
+          aria-hidden="true"
+        >
+          <span class="wg-axis-unit">${rightAxis.unit}</span>
+          ${rightAxis.ticks.map(
             (val, idx) => html`
               <span
                 class="wg-axis-tick"
@@ -588,8 +695,7 @@ export class WgForecastChart extends LitElement {
             <g class="wg-daynight-bands">
               ${bands.map((b) => {
                 const w = Math.max(0, b.endX - b.startX);
-                const stripColor = b.isNight ? "#1b2e42" : "#2b5272";
-                const plotColor = b.isNight ? "#132334" : "#1c364c";
+                const tone = b.isNight ? "night" : "day";
                 return svg`
                   <g>
                     <rect
@@ -597,21 +703,21 @@ export class WgForecastChart extends LitElement {
                       y="0"
                       width=${w + 0.5}
                       height=${STRIP_HEIGHT}
-                      fill=${stripColor}
+                      class="wg-band-${tone}-strip"
                     />
                     <rect
                       x=${b.startX}
                       y=${STRIP_HEIGHT}
                       width=${w + 0.5}
                       height=${SVG_HEIGHT - STRIP_HEIGHT}
-                      fill=${plotColor}
+                      class="wg-band-${tone}-plot"
                     />
                   </g>
                 `;
               })}
             </g>
 
-            <g stroke="rgba(255, 255, 255, 0.06)" stroke-width="1">
+            <g class="wg-grid-vertical" stroke-width="1">
               ${threeHourIndices.map((idx) => {
                 const x = xForIndex(idx);
                 return svg`
@@ -620,7 +726,7 @@ export class WgForecastChart extends LitElement {
               })}
             </g>
 
-            <g stroke="rgba(255, 255, 255, 0.075)" stroke-width="1">
+            <g class="wg-grid-horizontal" stroke-width="1">
               ${gridYs.map(
                 (y) => svg`
                   <line x1="0" y1=${y} x2=${totalWidth} y2=${y} />
@@ -633,10 +739,10 @@ export class WgForecastChart extends LitElement {
               y1=${STRIP_HEIGHT}
               x2=${totalWidth}
               y2=${STRIP_HEIGHT}
-              stroke="rgba(164, 194, 222, 0.34)"
+              class="wg-strip-rule"
               stroke-width="1.2"
             />
-            <g stroke="rgba(164, 194, 222, 0.36)" stroke-width="1.2">
+            <g class="wg-strip-rule" stroke-width="1.2">
               ${this.hours.map((_, idx) => {
                 const x = xForIndex(idx);
                 return svg`
@@ -671,7 +777,7 @@ export class WgForecastChart extends LitElement {
                       x=${x}
                       y="57"
                       text-anchor="middle"
-                      fill="#e2ecf7"
+                      class="wg-hour-label"
                       font-size="13"
                       font-weight="500"
                       font-family="inherit"
@@ -698,11 +804,11 @@ export class WgForecastChart extends LitElement {
             <g
               class="wg-series-layer ${this.showRain ? "" : "wg-series-hidden"}"
             >
-              <path d=${rainAreaPath} fill="rgba(66, 158, 196, 0.48)" />
+              <path d=${rainAreaPath} class="wg-rain-area" />
               <path
                 d=${rainStrokePath}
                 fill="none"
-                stroke="rgba(96, 192, 232, 0.55)"
+                class="wg-rain-stroke"
                 stroke-width="1.4"
               />
             </g>
@@ -715,7 +821,7 @@ export class WgForecastChart extends LitElement {
               <path
                 d=${tempLinePath}
                 fill="none"
-                stroke="#f5be36"
+                class="wg-temp-line"
                 stroke-width="3.6"
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -728,7 +834,7 @@ export class WgForecastChart extends LitElement {
               <path
                 d=${windLinePath}
                 fill="none"
-                stroke="rgba(226, 236, 248, 0.25)"
+                class="wg-wind-line"
                 stroke-width="2"
                 stroke-linecap="round"
               />
@@ -741,7 +847,8 @@ export class WgForecastChart extends LitElement {
                       cx=${wx}
                       cy=${wy}
                       r="3"
-                      fill="rgba(255, 255, 255, 0.7)"
+                      class="wg-wind-marker"
+                      fill-opacity="0.7"
                     />
                   `;
                 }
@@ -749,7 +856,7 @@ export class WgForecastChart extends LitElement {
                 return svg`
                   <path
                     d="M 0 -7.2 L 5.2 6.4 L 0 3.3 L -5.2 6.4 Z"
-                    fill="#ffffff"
+                    class="wg-wind-marker"
                     transform="translate(${wx}, ${wy}) rotate(${rot})"
                   />
                 `;
@@ -759,14 +866,14 @@ export class WgForecastChart extends LitElement {
             <g class="wg-scrubber-cursor">
               <polygon
                 points="${cursorX - 6.5},0 ${cursorX + 6.5},0 ${cursorX},8.5"
-                fill="#ffffff"
+                class="wg-scrubber-head"
               />
               <line
                 x1=${cursorX}
                 y1="7"
                 x2=${cursorX}
                 y2=${SVG_HEIGHT}
-                stroke="#ffffff"
+                class="wg-scrubber-line"
                 stroke-width="2.6"
                 stroke-dasharray="9 6"
               />

@@ -1,5 +1,19 @@
 import { LitElement, type PropertyDeclarations, css, html } from "lit";
-import type { HomeAssistant, WeatherGraphCardConfig } from "../types";
+import {
+  DEFAULT_PALETTE_ID,
+  PALETTE_PRESETS,
+  PALETTE_SLOTS,
+  type PaletteSlot,
+  effectiveOverrides,
+  getPalettePreset,
+  resolvePalette,
+} from "../theme/palette";
+import type { HomeAssistant, SummaryMetric, WeatherGraphCardConfig } from "../types";
+import {
+  MAX_SUMMARY_METRICS,
+  SUMMARY_METRIC_OPTIONS,
+  normalizeSummaryMetrics,
+} from "../utils/summary-metrics";
 
 export class WeatherGraphCardEditor extends LitElement {
   static properties: PropertyDeclarations = {
@@ -77,6 +91,84 @@ export class WeatherGraphCardEditor extends LitElement {
       font-size: 13.5px;
       cursor: pointer;
     }
+
+    .row-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 8px 12px;
+    }
+
+    .swatch {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .swatch input[type="color"] {
+      width: 34px;
+      height: 28px;
+      padding: 0;
+      border: 1px solid var(--divider-color, rgba(148, 163, 184, 0.3));
+      border-radius: 6px;
+      background: none;
+      cursor: pointer;
+      flex: none;
+    }
+
+    .swatch-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.25;
+    }
+
+    .swatch-hex {
+      font-size: 11px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--secondary-text-color, #94a3b8);
+    }
+
+    .swatch-hex.custom {
+      color: var(--primary-color, #03a9f4);
+    }
+
+    .revert-btn {
+      appearance: none;
+      border: 1px solid var(--divider-color, rgba(148, 163, 184, 0.3));
+      background: transparent;
+      color: var(--primary-text-color, #f8fafc);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .revert-btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    @media (max-width: 420px) {
+      .row-3 {
+        grid-template-columns: 1fr;
+      }
+    }
   `;
 
   public setConfig(config: WeatherGraphCardConfig): void {
@@ -87,10 +179,16 @@ export class WeatherGraphCardEditor extends LitElement {
     key: K,
     value: WeatherGraphCardConfig[K]
   ): void {
-    const nextConfig: WeatherGraphCardConfig = {
-      ...this._config,
-      [key]: value,
-    };
+    const nextConfig: WeatherGraphCardConfig = { ...this._config };
+    if (value === undefined) {
+      delete nextConfig[key];
+    } else {
+      nextConfig[key] = value;
+    }
+    this._emit(nextConfig);
+  }
+
+  private _emit(nextConfig: WeatherGraphCardConfig): void {
     this._config = nextConfig;
     this.dispatchEvent(
       new CustomEvent("config-changed", {
@@ -99,6 +197,125 @@ export class WeatherGraphCardEditor extends LitElement {
         composed: true,
       })
     );
+  }
+
+  private _setMetric(position: number, value: string): void {
+    const current: Array<SummaryMetric | ""> = normalizeSummaryMetrics(this._config.metrics);
+    while (current.length < MAX_SUMMARY_METRICS) current.push("");
+    current[position] = value as SummaryMetric | "";
+    const next = current.filter(
+      (m, i): m is SummaryMetric => m !== "" && current.indexOf(m) === i
+    );
+    this._update("metrics", next);
+  }
+
+  private _setPalette(paletteId: string): void {
+    const nextConfig: WeatherGraphCardConfig = { ...this._config, palette: paletteId };
+    delete nextConfig.colors;
+    this._emit(nextConfig);
+  }
+
+  private _setColor(slot: PaletteSlot, value: string): void {
+    const overrides = effectiveOverrides(this._config.palette, {
+      ...this._config.colors,
+      [slot]: value,
+    });
+    this._update("colors", Object.keys(overrides).length > 0 ? overrides : undefined);
+  }
+
+  private _renderMetricsSection() {
+    const metrics = normalizeSummaryMetrics(this._config.metrics);
+    return html`
+      <div class="field">
+        <label>Summary Fields</label>
+        <div class="row-3">
+          ${Array.from({ length: MAX_SUMMARY_METRICS }, (_, i) => {
+            const selected: SummaryMetric | "" = i < metrics.length ? metrics[i] : "";
+            return html`
+              <select
+                aria-label="Summary field ${i + 1}"
+                .value=${selected}
+                @change=${(e: Event) =>
+                  this._setMetric(i, (e.target as HTMLSelectElement).value)}
+              >
+                <option value="" ?selected=${selected === ""}>None</option>
+                ${SUMMARY_METRIC_OPTIONS.map(
+                  (opt) => html`
+                    <option
+                      value=${opt.id}
+                      ?selected=${selected === opt.id}
+                      ?disabled=${selected !== opt.id && metrics.includes(opt.id)}
+                    >
+                      ${opt.label}
+                    </option>
+                  `
+                )}
+              </select>
+            `;
+          })}
+        </div>
+        <span class="hint">Shown beside the selected hour's time and chance of rain.</span>
+      </div>
+    `;
+  }
+
+  private _renderColorsSection() {
+    const preset = getPalettePreset(this._config.palette);
+    const overrides = effectiveOverrides(this._config.palette, this._config.colors);
+    const colors = resolvePalette(this._config.palette, this._config.colors);
+    const hasOverrides = Object.keys(overrides).length > 0;
+
+    return html`
+      <div class="field">
+        <div class="section-head">
+          <label for="wg-palette">Colour Palette</label>
+          <button
+            type="button"
+            class="revert-btn"
+            ?disabled=${!hasOverrides}
+            @click=${() => this._update("colors", undefined)}
+          >
+            Revert to ${preset.name}
+          </button>
+        </div>
+        <select
+          id="wg-palette"
+          .value=${preset.id}
+          @change=${(e: Event) => this._setPalette((e.target as HTMLSelectElement).value)}
+        >
+          ${PALETTE_PRESETS.map(
+            (p) => html`
+              <option value=${p.id} ?selected=${p.id === preset.id}>
+                ${p.name}${p.id === DEFAULT_PALETTE_ID ? " (default)" : ""}
+              </option>
+            `
+          )}
+        </select>
+        <div class="swatches">
+          ${PALETTE_SLOTS.map(
+            ({ slot, label }) => html`
+              <label class="swatch">
+                <input
+                  type="color"
+                  .value=${colors[slot]}
+                  @input=${(e: Event) =>
+                    this._setColor(slot, (e.target as HTMLInputElement).value)}
+                />
+                <span class="swatch-text">
+                  <span>${label}</span>
+                  <span class="swatch-hex ${overrides[slot] ? "custom" : ""}">
+                    ${colors[slot]}${overrides[slot] ? " (custom)" : ""}
+                  </span>
+                </span>
+              </label>
+            `
+          )}
+        </div>
+        <span class="hint">
+          Pick a built-in palette, then adjust any colour. Changing palette clears custom colours.
+        </span>
+      </div>
+    `;
   }
 
   render() {
@@ -225,6 +442,8 @@ export class WeatherGraphCardEditor extends LitElement {
             </label>
           </div>
         </div>
+
+        ${this._renderMetricsSection()} ${this._renderColorsSection()}
       </div>
     `;
   }

@@ -151,7 +151,7 @@ const cloudDarkBack = (tx = 0, ty = 0) => svg`
 const rainDrops = (count: 2 | 3 | 4 = 3, yStart = 28.5) => {
   if (count === 2) {
     return svg`
-      <g fill="#4cc9f0">
+      <g style="fill: var(--wg-rain, #4cc9f0)">
         <circle cx="18.5" cy=${yStart + 1.5} r="1.45" />
         <circle cx="24.5" cy=${yStart + 3.2} r="1.45" />
       </g>
@@ -159,7 +159,7 @@ const rainDrops = (count: 2 | 3 | 4 = 3, yStart = 28.5) => {
   }
   if (count === 4) {
     return svg`
-      <g stroke="#4cc9f0" stroke-width="2.1" stroke-linecap="round">
+      <g style="stroke: var(--wg-rain, #4cc9f0)" stroke-width="2.1" stroke-linecap="round">
         <line x1="14.5" y1=${yStart} x2="12.8" y2=${yStart + 5} />
         <line x1="19.5" y1=${yStart + 0.8} x2="17.8" y2=${yStart + 5.8} />
         <line x1="24.5" y1=${yStart} x2="22.8" y2=${yStart + 5} />
@@ -168,7 +168,7 @@ const rainDrops = (count: 2 | 3 | 4 = 3, yStart = 28.5) => {
     `;
   }
   return svg`
-    <g fill="#4cc9f0">
+    <g style="fill: var(--wg-rain, #4cc9f0)">
       <circle cx="16.5" cy=${yStart + 1.2} r="1.4" />
       <circle cx="21.5" cy=${yStart + 3.6} r="1.4" />
       <circle cx="26.2" cy=${yStart + 1.4} r="1.4" />
@@ -180,7 +180,7 @@ const lightningBolt = () => svg`
   <polygon
     points="22.8,22.2 18.2,29.2 21.8,29.2 19.9,35.6 27.4,27.3 23.4,27.3"
     fill="#38bdf8"
-    stroke="#0d1e33"
+    style="stroke: var(--wg-bg, #0d1e33)"
     stroke-width="0.6"
     stroke-linejoin="round"
   />
@@ -377,7 +377,7 @@ export function renderRainDropletHtml(size = 18): TemplateResult {
     >
       <path
         d="M10 2.2C10 2.2 3.2 10.4 3.2 15.1A6.8 6.8 0 0 0 16.8 15.1C16.8 10.4 10 2.2 10 2.2Z"
-        fill="#4cc9f0"
+        style="fill: var(--wg-rain, #4cc9f0)"
       />
     </svg>
   `;

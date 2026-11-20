@@ -1,17 +1,19 @@
-import { html, type TemplateResult } from "lit";
+import { html, nothing, type TemplateResult } from "lit";
 import {
   renderRainDropletHtml,
   renderWeatherIconHtml,
   resolveWeatherVisualKind,
 } from "../icons/weather-icons";
-import type { CurrentObservation, NormalizedHourPoint } from "../types";
+import type { CurrentObservation, NormalizedHourPoint, SummaryMetric } from "../types";
 import { formatHeaderDayHour } from "../utils/forecast-utils";
+import { formatSummaryMetric } from "../utils/summary-metrics";
 
 export interface SummaryHeaderProps {
   point: NormalizedHourPoint;
   isFirstHour: boolean;
   currentObs: CurrentObservation | null;
   timeZone: string;
+  metrics: SummaryMetric[];
 }
 
 export function renderSummaryHeader({
@@ -19,33 +21,12 @@ export function renderSummaryHeader({
   isFirstHour,
   currentObs,
   timeZone,
+  metrics,
 }: SummaryHeaderProps): TemplateResult {
   const temp =
     isFirstHour && currentObs?.temperature !== null && currentObs?.temperature !== undefined
       ? currentObs.temperature
       : point.temperature;
-
-  const humidity =
-    isFirstHour && currentObs?.humidity !== null && currentObs?.humidity !== undefined
-      ? currentObs.humidity
-      : point.humidity;
-
-  const dewPoint =
-    isFirstHour && currentObs?.dew_point !== null && currentObs?.dew_point !== undefined
-      ? currentObs.dew_point
-      : point.dew_point;
-
-  const windSpeed =
-    isFirstHour &&
-    currentObs?.wind_speed_kmh !== null &&
-    currentObs?.wind_speed_kmh !== undefined
-      ? currentObs.wind_speed_kmh
-      : point.wind_speed_kmh;
-
-  const windDir =
-    (isFirstHour && currentObs?.wind_direction ? currentObs.wind_direction : null) ??
-    point.wind_direction ??
-    "";
 
   const visualKind = resolveWeatherVisualKind(
     point.icon_descriptor,
@@ -57,17 +38,14 @@ export function renderSummaryHeader({
     temp !== null && temp !== undefined ? `${Math.round(temp)}°` : "--°";
   const rainDisplay = `${Math.round(point.rain_chance)}%`;
   const timeDisplay = formatHeaderDayHour(point.epoch_ms, timeZone);
-  const windDisplay =
-    windSpeed <= 0.4 && !windDir
-      ? "Calm"
-      : `${windDir ? `${windDir} ` : ""}${Math.round(windSpeed)} km/h`;
-  const humidityDisplay =
-    humidity !== null && humidity !== undefined ? `${Math.round(humidity)}%` : "--%";
-  const dewPointDisplay =
-    dewPoint !== null && dewPoint !== undefined ? `${Math.round(dewPoint)}°C` : "--°C";
 
   return html`
-    <div class="wg-summary-panel" role="region" aria-label="Selected hour forecast details">
+    <div
+      class="wg-summary-panel ${metrics.length === 0 ? "wg-no-metrics" : ""}"
+      role="region"
+      aria-label="Selected hour forecast details"
+      style="--wg-metric-count: ${Math.max(1, metrics.length)}"
+    >
       <div class="wg-summary-left">
         <div class="wg-summary-icon">
           ${renderWeatherIconHtml(visualKind, 42)}
@@ -83,20 +61,21 @@ export function renderSummaryHeader({
         </div>
       </div>
 
-      <div class="wg-summary-metrics">
-        <div class="wg-metric-row">
-          <span class="wg-metric-label">WIND</span>
-          <span class="wg-metric-value">${windDisplay}</span>
-        </div>
-        <div class="wg-metric-row">
-          <span class="wg-metric-label">HUMIDITY</span>
-          <span class="wg-metric-value">${humidityDisplay}</span>
-        </div>
-        <div class="wg-metric-row">
-          <span class="wg-metric-label">DEW POINT</span>
-          <span class="wg-metric-value">${dewPointDisplay}</span>
-        </div>
-      </div>
+      ${metrics.length > 0
+        ? html`
+            <div class="wg-summary-metrics">
+              ${metrics.map((m) => {
+                const { label, value } = formatSummaryMetric(m, point, isFirstHour, currentObs);
+                return html`
+                  <div class="wg-metric-row">
+                    <span class="wg-metric-label">${label}</span>
+                    <span class="wg-metric-value">${value}</span>
+                  </div>
+                `;
+              })}
+            </div>
+          `
+        : nothing}
     </div>
   `;
 }

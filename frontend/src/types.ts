@@ -1,5 +1,19 @@
+import type { PaletteSlot } from "./theme/palette";
+
+export type SummaryMetric =
+  | "wind"
+  | "wind_gust"
+  | "humidity"
+  | "dew_point"
+  | "feels_like"
+  | "uv"
+  | "rain_amount";
+
 export interface WeatherGraphCardConfig {
   type: string;
+  metrics?: SummaryMetric[];
+  palette?: string;
+  colors?: Partial<Record<PaletteSlot, string>>;
   entity?: string;
   bom_entry_id?: string;
   title?: string;

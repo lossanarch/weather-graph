@@ -1,8 +1,10 @@
 import { LitElement, type PropertyDeclarations, css, html, nothing } from "lit";
+import { styleMap } from "lit/directives/style-map.js";
 import "./components/forecast-chart";
 import { renderSummaryHeader } from "./components/summary-header";
 import "./editor/weather-graph-card-editor";
 import { renderWindLegendArrowHtml } from "./icons/weather-icons";
+import { buildThemeVars, resolvePalette } from "./theme/palette";
 import type {
   CurrentObservation,
   HomeAssistant,
@@ -15,6 +17,7 @@ import {
   normalizeWindBearing,
   resolveWeatherEntityId,
 } from "./utils/forecast-utils";
+import { normalizeSummaryMetrics } from "./utils/summary-metrics";
 
 const CARD_VERSION = "1.0.1";
 
@@ -75,14 +78,12 @@ export class WeatherGraphCard extends LitElement {
     }
 
     .wg-card {
-      background: #0f2137;
-      color: #f8fafc;
+      container: wg-card / inline-size;
+      background: var(--wg-bg);
+      color: var(--wg-text);
       border-radius: var(--ha-card-border-radius, 14px);
-      border: 1px solid rgba(125, 169, 212, 0.14);
-      box-shadow: var(
-        --ha-card-box-shadow,
-        0 10px 28px rgba(3, 10, 20, 0.36)
-      );
+      border: 1px solid var(--wg-border);
+      box-shadow: var(--ha-card-box-shadow, 0 10px 28px var(--wg-shadow));
       overflow: hidden;
     }
 
@@ -99,13 +100,13 @@ export class WeatherGraphCard extends LitElement {
       font-size: 21px;
       font-weight: 700;
       letter-spacing: -0.01em;
-      color: #ffffff;
+      color: var(--wg-text);
     }
 
     .wg-card-subtitle {
       font-size: 12px;
       font-weight: 500;
-      color: #8ea6c2;
+      color: var(--wg-text-muted);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -114,12 +115,16 @@ export class WeatherGraphCard extends LitElement {
     .wg-summary-panel {
       margin: 0 14px 14px;
       padding: 14px 18px;
-      background: #091525;
+      background: var(--wg-panel);
       border-radius: 10px;
       display: grid;
       grid-template-columns: auto minmax(110px, 1fr) auto;
       align-items: center;
       gap: 18px;
+    }
+
+    .wg-summary-panel.wg-no-metrics {
+      grid-template-columns: auto 1fr;
     }
 
     .wg-summary-left {
@@ -141,7 +146,7 @@ export class WeatherGraphCard extends LitElement {
       font-size: 31px;
       font-weight: 600;
       line-height: 1.05;
-      color: #f5be36;
+      color: var(--wg-temp);
       font-variant-numeric: tabular-nums;
     }
 
@@ -156,7 +161,7 @@ export class WeatherGraphCard extends LitElement {
       font-size: 18px;
       font-weight: 700;
       letter-spacing: 0.02em;
-      color: #ffffff;
+      color: var(--wg-text);
     }
 
     .wg-summary-rain {
@@ -174,7 +179,7 @@ export class WeatherGraphCard extends LitElement {
       font-size: 30px;
       font-weight: 600;
       line-height: 1.05;
-      color: #4cc9f0;
+      color: var(--wg-rain);
       font-variant-numeric: tabular-nums;
     }
 
@@ -194,14 +199,14 @@ export class WeatherGraphCard extends LitElement {
       font-size: 12.5px;
       font-weight: 500;
       letter-spacing: 0.03em;
-      color: #8da4be;
+      color: var(--wg-text-muted);
       text-transform: uppercase;
     }
 
     .wg-metric-value {
       font-size: 15.5px;
       font-weight: 700;
-      color: #ffffff;
+      color: var(--wg-text);
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
@@ -211,8 +216,8 @@ export class WeatherGraphCard extends LitElement {
       align-items: center;
       justify-content: space-around;
       padding: 12px 14px 14px;
-      background: #081525;
-      border-top: 1px solid rgba(125, 169, 212, 0.14);
+      background: var(--wg-legend-bg);
+      border-top: 1px solid var(--wg-border);
       gap: 8px;
     }
 
@@ -244,6 +249,7 @@ export class WeatherGraphCard extends LitElement {
       bottom: 0;
       height: 3px;
       border-radius: 2px;
+      background: currentColor;
       transition: opacity 0.18s ease, transform 0.18s ease;
     }
 
@@ -257,33 +263,21 @@ export class WeatherGraphCard extends LitElement {
     }
 
     .wg-legend-temp {
-      color: #f5be36;
-    }
-
-    .wg-legend-temp::after {
-      background: #f5be36;
+      color: var(--wg-temp);
     }
 
     .wg-legend-rain {
-      color: #4cc9f0;
-    }
-
-    .wg-legend-rain::after {
-      background: #4cc9f0;
+      color: var(--wg-rain);
     }
 
     .wg-legend-wind {
-      color: #ffffff;
-    }
-
-    .wg-legend-wind::after {
-      background: #ffffff;
+      color: var(--wg-wind);
     }
 
     .wg-status-box {
       padding: 36px 22px;
       text-align: center;
-      color: #9fb5cc;
+      color: var(--wg-text-muted);
       font-size: 14px;
       line-height: 1.5;
     }
@@ -294,9 +288,9 @@ export class WeatherGraphCard extends LitElement {
       border-radius: 10px;
       background: linear-gradient(
         90deg,
-        rgba(24, 46, 71, 0.55) 25%,
-        rgba(38, 70, 104, 0.75) 50%,
-        rgba(24, 46, 71, 0.55) 75%
+        var(--wg-skeleton-a) 25%,
+        var(--wg-skeleton-b) 50%,
+        var(--wg-skeleton-a) 75%
       );
       background-size: 200% 100%;
       animation: wg-shimmer 1.5s infinite linear;
@@ -311,19 +305,28 @@ export class WeatherGraphCard extends LitElement {
       }
     }
 
-    @media (max-width: 440px) {
-      .wg-summary-panel {
+    @container wg-card (max-width: 480px) {
+      .wg-summary-panel,
+      .wg-summary-panel.wg-no-metrics {
         grid-template-columns: auto 1fr;
         gap: 12px 16px;
         padding: 12px 14px;
       }
 
+      .wg-summary-center {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-evenly;
+        gap: 6px 16px;
+      }
+
       .wg-summary-metrics {
         grid-column: 1 / -1;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(var(--wg-metric-count, 3), 1fr);
         gap: 8px;
         padding-top: 8px;
-        border-top: 1px solid rgba(148, 179, 209, 0.14);
+        border-top: 1px solid var(--wg-border);
       }
 
       .wg-metric-row {
@@ -575,8 +578,12 @@ export class WeatherGraphCard extends LitElement {
           }`
         : "";
 
+    const themeVars = buildThemeVars(
+      resolvePalette(this._config.palette, this._config.colors)
+    );
+
     return html`
-      <div class="wg-card">
+      <div class="wg-card" style=${styleMap(themeVars)}>
         <div class="wg-card-header">
           <h2 class="wg-card-title">${title}</h2>
           ${locationLabel
@@ -606,6 +613,7 @@ export class WeatherGraphCard extends LitElement {
                     this._payload?.location?.timezone ??
                     this.hass?.config?.time_zone ??
                     "Australia/Sydney",
+                  metrics: normalizeSummaryMetrics(this._config.metrics),
                 })}
 
                 <wg-forecast-chart
@@ -706,6 +714,6 @@ if (
 
 console.info(
   `%c WEATHER-GRAPH-CARD %c v${CARD_VERSION} `,
-  "background:#0f2137;color:#f5be36;font-weight:700;padding:2px 6px;border-radius:4px 0 0 4px;",
-  "background:#4cc9f0;color:#091525;font-weight:700;padding:2px 6px;border-radius:0 4px 4px 0;"
+  "background:#1b1a2e;color:#ff8f6b;font-weight:700;padding:2px 6px;border-radius:4px 0 0 4px;",
+  "background:#59c3c3;color:#1b1a2e;font-weight:700;padding:2px 6px;border-radius:0 4px 4px 0;"
 );
