@@ -19,7 +19,7 @@ import {
 } from "./utils/forecast-utils";
 import { normalizeSummaryMetrics } from "./utils/summary-metrics";
 
-const CARD_VERSION = "1.0.1";
+const CARD_VERSION = "1.1.0";
 
 export class WeatherGraphCard extends LitElement {
   static properties: PropertyDeclarations = {
@@ -140,6 +140,7 @@ export class WeatherGraphCard extends LitElement {
       align-items: center;
       justify-content: center;
       height: 42px;
+      filter: var(--wg-icon-filter, none);
     }
 
     .wg-summary-temp {

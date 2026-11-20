@@ -202,6 +202,9 @@ export function buildThemeVars(colors: PaletteColors): Record<string, string> {
     "--wg-day-label": mixHex(rain, text, 0.5),
     "--wg-control-bg": hexToRgba(panel, 0.82),
     "--wg-control-border": hexToRgba(text, 0.18),
+    "--wg-icon-filter": isDark
+      ? "none"
+      : "drop-shadow(0 0 0.6px rgba(0, 0, 0, 0.55)) drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.18))",
     "--wg-skeleton-a": hexToRgba(mixHex(bg, daytime, 0.4), 0.55),
     "--wg-skeleton-b": hexToRgba(mixHex(bg, daytime, 0.8), 0.75),
   };

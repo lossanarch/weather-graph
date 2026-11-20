@@ -287,6 +287,10 @@ export class WgForecastChart extends LitElement {
       stroke: var(--wg-strip-rule);
     }
 
+    .wg-strip-icon {
+      filter: var(--wg-icon-filter, none);
+    }
+
     .wg-hour-label {
       fill: var(--wg-text);
     }
@@ -772,7 +776,9 @@ export class WgForecastChart extends LitElement {
                   : null;
                 return svg`
                   <g>
-                    ${renderWeatherIconInSvg(kind, x - 16, 6, 32)}
+                    <g class="wg-strip-icon">
+                      ${renderWeatherIconInSvg(kind, x - 16, 6, 32)}
+                    </g>
                     <text
                       x=${x}
                       y="57"

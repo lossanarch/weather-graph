@@ -91,11 +91,13 @@ export class WgPreviewWorkbench extends LitElement {
     _hass: { state: true },
     _activeProfileId: { state: true },
     _cardConfig: { state: true },
+    _cardWidth: { state: true },
   };
 
   declare private _hass: HomeAssistant;
   declare private _activeProfileId: string;
   declare private _cardConfig: WeatherGraphCardConfig;
+  declare private _cardWidth: number | null;
 
   constructor() {
     super();
@@ -112,6 +114,7 @@ export class WgPreviewWorkbench extends LitElement {
       show_wind: true,
       show_location: false,
     };
+    this._cardWidth = null;
   }
 
   static styles = css`
@@ -303,6 +306,20 @@ export class WgPreviewWorkbench extends LitElement {
     if (this._cardConfig.show_location) {
       lines.push("show_location: true");
     }
+    if (this._cardConfig.metrics) {
+      lines.push(
+        this._cardConfig.metrics.length
+          ? `metrics:\n${this._cardConfig.metrics.map((m) => `  - ${m}`).join("\n")}`
+          : "metrics: []"
+      );
+    }
+    if (this._cardConfig.palette) {
+      lines.push(`palette: ${this._cardConfig.palette}`);
+    }
+    const colors = Object.entries(this._cardConfig.colors ?? {});
+    if (colors.length) {
+      lines.push(`colors:\n${colors.map(([k, v]) => `  ${k}: "${v}"`).join("\n")}`);
+    }
     return lines.join("\n");
   }
 
@@ -344,7 +361,27 @@ export class WgPreviewWorkbench extends LitElement {
 
         <div class="workspace-grid">
           <div>
+            <div class="profile-bar" aria-label="Preview card width">
+              ${[
+                { label: "Full width", width: null },
+                { label: "420 px", width: 420 },
+                { label: "360 px", width: 360 },
+              ].map(
+                (opt) => html`
+                  <button
+                    type="button"
+                    class="profile-pill ${this._cardWidth === opt.width ? "active" : ""}"
+                    @click=${() => {
+                      this._cardWidth = opt.width;
+                    }}
+                  >
+                    ${opt.label}
+                  </button>
+                `
+              )}
+            </div>
             <weather-graph-card
+              style=${this._cardWidth ? `max-width: ${this._cardWidth}px` : ""}
               .hass=${this._hass}
             ></weather-graph-card>
             <div class="hint-bar">
