@@ -1,10 +1,11 @@
-import { LitElement, type PropertyDeclarations, css, html } from "lit";
+import { LitElement, type PropertyDeclarations, css, html, svg } from "lit";
 import {
   DEFAULT_PALETTE_ID,
   PALETTE_PRESETS,
   PALETTE_SLOTS,
   type PaletteColors,
   type PaletteSlot,
+  contrastRatio,
   effectiveOverrides,
   getPalettePreset,
   resolvePalette,
@@ -16,6 +17,21 @@ import {
   SUMMARY_METRIC_OPTIONS,
   normalizeSummaryMetrics,
 } from "../utils/summary-metrics";
+
+const ACCENT_SLOTS: ReadonlySet<PaletteSlot> = new Set(["temperature", "rain", "wind"]);
+const LOW_CONTRAST_RATIO = 1.5;
+const DRAG_THRESHOLD_PX = 4;
+
+interface SwatchDrag {
+  slot: PaletteSlot;
+  pointerId: number;
+  startX: number;
+  startY: number;
+  dx: number;
+  dy: number;
+  moved: boolean;
+  over?: PaletteSlot;
+}
 
 const PASTE_PLACEHOLDER = [
   "c7eae4,a7e8bd,fcbcb8,efa7a7,ffd972",
@@ -30,12 +46,16 @@ export class WeatherGraphCardEditor extends LitElement {
     _config: { state: true },
     _pasteText: { state: true },
     _pasteNote: { state: true },
+    _drag: { state: true },
+    _tapSlot: { state: true },
   };
 
   declare hass?: HomeAssistant;
   declare private _config: WeatherGraphCardConfig;
   declare private _pasteText: string;
   declare private _pasteNote?: { kind: "error" | "success"; text: string };
+  declare private _drag?: SwatchDrag;
+  declare private _tapSlot?: PaletteSlot;
 
   constructor() {
     super();
@@ -121,16 +141,61 @@ export class WeatherGraphCardEditor extends LitElement {
 
     .swatches {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 8px 12px;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 8px;
     }
 
     .swatch {
+      position: relative;
       display: flex;
       align-items: center;
-      gap: 9px;
+      gap: 8px;
+      padding: 6px 8px 6px 4px;
+      border: 1px solid var(--divider-color, rgba(148, 163, 184, 0.3));
+      border-radius: 10px;
       font-size: 13px;
-      cursor: pointer;
+      transition:
+        border-color 120ms ease,
+        background-color 120ms ease,
+        box-shadow 120ms ease;
+    }
+
+    .swatch.selected,
+    .swatch.dragging {
+      border-color: var(--primary-color, #03a9f4);
+    }
+
+    .swatch.drop-target {
+      border-color: var(--primary-color, #03a9f4);
+      background: color-mix(in srgb, var(--primary-color, #03a9f4) 14%, transparent);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color, #03a9f4) 35%, transparent);
+    }
+
+    .grip {
+      appearance: none;
+      display: grid;
+      place-items: center;
+      width: 22px;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--secondary-text-color, #94a3b8);
+      cursor: grab;
+      touch-action: none;
+      flex: none;
+    }
+
+    .grip:hover,
+    .grip:focus-visible,
+    .swatch.selected .grip {
+      color: var(--primary-text-color, #f8fafc);
+      background: color-mix(in srgb, var(--primary-text-color, #f8fafc) 8%, transparent);
+    }
+
+    .swatch.dragging .grip {
+      cursor: grabbing;
     }
 
     .swatch input[type="color"] {
@@ -144,10 +209,21 @@ export class WeatherGraphCardEditor extends LitElement {
       flex: none;
     }
 
+    .swatch.dragging input[type="color"] {
+      position: relative;
+      z-index: 2;
+      pointer-events: none;
+      transform: translate(var(--drag-x, 0px), var(--drag-y, 0px)) scale(1.12);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+
     .swatch-text {
       display: flex;
       flex-direction: column;
+      min-width: 0;
       line-height: 1.25;
+      font-weight: 400;
+      cursor: pointer;
     }
 
     .swatch-hex {
@@ -158,6 +234,18 @@ export class WeatherGraphCardEditor extends LitElement {
 
     .swatch-hex.custom {
       color: var(--primary-color, #03a9f4);
+    }
+
+    .low-contrast {
+      align-self: flex-start;
+      margin-top: 2px;
+      padding: 0 6px;
+      border-radius: 999px;
+      font-size: 10.5px;
+      font-weight: 600;
+      line-height: 16px;
+      color: var(--warning-color, #f59e0b);
+      background: color-mix(in srgb, var(--warning-color, #f59e0b) 16%, transparent);
     }
 
     .revert-btn {
@@ -329,6 +417,140 @@ export class WeatherGraphCardEditor extends LitElement {
     }
   }
 
+  private _swapColors(a: PaletteSlot, b: PaletteSlot): void {
+    if (a === b) return;
+    const colors = resolvePalette(this._config.palette, this._config.colors);
+    this._applyColors({ ...colors, [a]: colors[b], [b]: colors[a] });
+  }
+
+  private _slotAt(x: number, y: number): PaletteSlot | undefined {
+    const hit = this.shadowRoot?.elementFromPoint(x, y);
+    const tile = hit?.closest<HTMLElement>(".swatch[data-slot]");
+    return tile?.dataset.slot as PaletteSlot | undefined;
+  }
+
+  private _tapGrip(slot: PaletteSlot): void {
+    if (!this._tapSlot) {
+      this._tapSlot = slot;
+    } else {
+      if (this._tapSlot !== slot) this._swapColors(this._tapSlot, slot);
+      this._tapSlot = undefined;
+    }
+  }
+
+  private _onGripDown(e: PointerEvent, slot: PaletteSlot): void {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {
+      // Capture is best-effort; without it the drag still works while over the grip.
+    }
+    this._drag = {
+      slot,
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startY: e.clientY,
+      dx: 0,
+      dy: 0,
+      moved: false,
+    };
+  }
+
+  private _onGripMove(e: PointerEvent): void {
+    const drag = this._drag;
+    if (!drag || drag.pointerId !== e.pointerId) return;
+    const dx = e.clientX - drag.startX;
+    const dy = e.clientY - drag.startY;
+    const moved = drag.moved || Math.hypot(dx, dy) > DRAG_THRESHOLD_PX;
+    if (!moved) return;
+    const over = this._slotAt(e.clientX, e.clientY);
+    this._drag = { ...drag, dx, dy, moved, over: over !== drag.slot ? over : undefined };
+    if (this._tapSlot) this._tapSlot = undefined;
+  }
+
+  private _onGripUp(e: PointerEvent): void {
+    const drag = this._drag;
+    if (!drag || drag.pointerId !== e.pointerId) return;
+    this._drag = undefined;
+    if (!drag.moved) {
+      this._tapGrip(drag.slot);
+    } else if (drag.over) {
+      this._swapColors(drag.slot, drag.over);
+    }
+  }
+
+  private _renderSwatch(
+    slot: PaletteSlot,
+    label: string,
+    colors: PaletteColors,
+    overrides: Partial<PaletteColors>
+  ) {
+    const drag = this._drag;
+    const dragging = drag?.slot === slot && drag.moved;
+    const lowContrast =
+      ACCENT_SLOTS.has(slot) && contrastRatio(colors[slot], colors.background) < LOW_CONTRAST_RATIO;
+    const classes = [
+      "swatch",
+      dragging ? "dragging" : "",
+      drag?.over === slot ? "drop-target" : "",
+      this._tapSlot === slot ? "selected" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+    const swapHint = this._tapSlot && this._tapSlot !== slot;
+
+    return html`
+      <div
+        class=${classes}
+        data-slot=${slot}
+        style=${dragging ? `--drag-x: ${drag.dx}px; --drag-y: ${drag.dy}px` : ""}
+      >
+        <button
+          type="button"
+          class="grip"
+          aria-label=${swapHint ? `Swap with ${label}` : `Move ${label} colour`}
+          aria-pressed=${this._tapSlot === slot ? "true" : "false"}
+          title="Drag onto another colour to swap, or tap two handles"
+          @pointerdown=${(e: PointerEvent) => this._onGripDown(e, slot)}
+          @pointermove=${(e: PointerEvent) => this._onGripMove(e)}
+          @pointerup=${(e: PointerEvent) => this._onGripUp(e)}
+          @pointercancel=${() => (this._drag = undefined)}
+          @click=${(e: MouseEvent) => {
+            if (e.detail === 0) this._tapGrip(slot);
+          }}
+          @keydown=${(e: KeyboardEvent) => {
+            if (e.key === "Escape") this._tapSlot = undefined;
+          }}
+        >
+          <svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true">
+            ${[3, 8, 13].map(
+              (cy) => svg`<circle cx="2.5" cy=${cy} r="1.5" fill="currentColor" />
+                <circle cx="7.5" cy=${cy} r="1.5" fill="currentColor" />`
+            )}
+          </svg>
+        </button>
+        <input
+          id="wg-color-${slot}"
+          type="color"
+          .value=${colors[slot]}
+          @input=${(e: Event) => this._setColor(slot, (e.target as HTMLInputElement).value)}
+        />
+        <label class="swatch-text" for="wg-color-${slot}">
+          <span>${label}</span>
+          <span class="swatch-hex ${overrides[slot] ? "custom" : ""}">
+            ${colors[slot]}${overrides[slot] ? " (custom)" : ""}
+          </span>
+          ${lowContrast
+            ? html`<span class="low-contrast" title="Hard to see against the background">
+                low contrast
+              </span>`
+            : null}
+        </label>
+      </div>
+    `;
+  }
+
   private _renderPasteBox() {
     const invalid = this._pasteNote?.kind === "error";
     return html`
@@ -446,27 +668,13 @@ export class WeatherGraphCardEditor extends LitElement {
           )}
         </select>
         <div class="swatches">
-          ${PALETTE_SLOTS.map(
-            ({ slot, label }) => html`
-              <label class="swatch">
-                <input
-                  type="color"
-                  .value=${colors[slot]}
-                  @input=${(e: Event) =>
-                    this._setColor(slot, (e.target as HTMLInputElement).value)}
-                />
-                <span class="swatch-text">
-                  <span>${label}</span>
-                  <span class="swatch-hex ${overrides[slot] ? "custom" : ""}">
-                    ${colors[slot]}${overrides[slot] ? " (custom)" : ""}
-                  </span>
-                </span>
-              </label>
-            `
+          ${PALETTE_SLOTS.map(({ slot, label }) =>
+            this._renderSwatch(slot, label, colors, overrides)
           )}
         </div>
         <span class="hint">
-          Pick a built-in palette, then adjust any colour. Changing palette clears custom colours.
+          Pick a built-in palette, then adjust any colour. Drag the handles (or tap two) to swap
+          colours. Changing palette clears custom colours.
         </span>
         ${this._renderPasteBox()}
       </div>
