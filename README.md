@@ -9,7 +9,7 @@ Designed to pair natively with the Australian [**Bureau of Meteorology (`bremor/
 ## Features
 
 - **Next 48 Hours Interactive Forecast Layout**:
-  - **Selected-Hour Summary Panel**: Weather condition icon, temperature (`°C`), day/hour label (`FRI 1PM`), rain probability (`53%`), and up to three fields of your choice: wind, wind gust, humidity, dew point, feels like, UV index, or rain amount. On narrow cards the fields wrap underneath and the time and rain spread across the row.
+  - **Selected-Hour Summary Panel**: Weather condition icon, temperature (`°C`), day/hour label (`FRI 1PM`), rain probability (`53%`), and up to three fields of your choice: wind, wind gust, humidity, dew point, feels like, UV index, UV time (BOM's sun protection times, e.g. `9:10am–4pm`), or rain amount. On narrow cards the fields wrap underneath and the time and rain spread across the row.
   - **Interactive 48-Hour Scrubber & Horizontal Scroll**: Click, drag, or use Left/Right arrow keys to move the vertical dashed cursor across any of the 48 hours while keeping the left `°C` and right `km/h` scales pinned in view.
   - **Day/Night Vertical Shading & 3-Hourly Condition Strip**: Daytime and nighttime background bands aligned to astronomical sunrise/sunset times, with 3-hourly condition icons and 1-hourly tick marks.
   - **Three Toggleable Data Layers**:
@@ -17,7 +17,7 @@ Designed to pair natively with the Australian [**Bureau of Meteorology (`bremor/
     - **Chance Rain**: Smooth monotone cubic filled area (`0–100%` plot height).
     - **Wind**: Wind speed curve + hourly directional wind-flow vector arrows (right `km/h` scale).
     - Hiding temperature or wind hands that axis to the rain `%` scale.
-- **Colour Palettes**: Five built-in palettes (Dusk, Midnight, Forest, Ember, Daylight), each with six editable colours and a one-click revert. Paste a palette from any generator, then drag swatches to swap colours.
+- **Colour Palettes**: Separate palettes for dark and light mode, chosen from five built-ins (Dusk, Midnight, Forest, Ember, Daylight), each with six editable colours and a one-click revert. Paste a palette from any generator, then drag swatches to swap colours.
 - **Zero Manual Resource Setup**: Serves the bundled ES module via Home Assistant's async static HTTP API and automatically registers it in Lovelace resources (falls back to a frontend extra module when resources are managed in YAML).
 
 ---
@@ -60,16 +60,23 @@ show_temperature: true
 show_rain: true
 show_wind: true
 show_location: false
-metrics:            # up to 3: wind, wind_gust, humidity, dew_point, feels_like, uv, rain_amount
+metrics:            # up to 3: wind, wind_gust, humidity, dew_point, feels_like, uv, uv_time, rain_amount
   - wind
   - humidity
   - dew_point
-palette: dusk       # dusk (default), midnight, forest, ember, daylight
-colors:             # optional overrides on top of the palette
+palette: dusk             # dark mode: dusk (default), midnight, forest, ember, daylight
+colors:                   # optional dark mode overrides on top of the palette
   rain: "#59c3c3"
+light_palette: daylight   # light mode: any of the same palettes, daylight by default
+light_colors:             # optional light mode overrides
+  rain: "#1f6fb2"
 ```
 
-`colors` accepts `background`, `daytime`, `temperature`, `rain`, `wind` and `text` as hex values. Other shades (panels, night shading, grid lines) are derived from these, so light backgrounds work too.
+The card uses `palette`/`colors` when Home Assistant is in dark mode and `light_palette`/`light_colors` otherwise. Home Assistant follows your system's light/dark setting unless you choose otherwise under **Profile -> Theme**; without that information the card follows the browser's system setting. In the visual editor, the **Dark mode / Light mode** switch above the palette picker chooses which palette you're editing. The editor preview shows the palette for the mode you're currently in. To use one palette everywhere, pick the same palette in both modes.
+
+`uv_time` shows the sun protection window for the selected hour's day, from the same BOM data as the `uv_start_time_0` / `uv_end_time_0` sensors. It reads `Not needed` when the UV index stays below 3. With other weather integrations it's worked out from the hourly UV index (3 or above), when the forecast covers that whole day.
+
+`colors` and `light_colors` accept `background`, `daytime`, `temperature`, `rain`, `wind` and `text` as hex values. Other shades (panels, night shading, grid lines) are derived from these, so light backgrounds work too.
 
 ### Paste a Palette
 
