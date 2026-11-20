@@ -123,37 +123,55 @@ const ACCENT_TARGET_HUE: Record<"temperature" | "rain", number> = {
   temperature: 30,
   rain: 205,
 };
-// Leftover accents go to wind; this bias keeps temperature and rain filled first
-// when there are fewer than three accents.
-const WIND_COST = 60;
-const DAYTIME_CONTRAST_COST = 40;
+const ACCENT_ROLES = ["temperature", "rain", "wind"] as const;
+type AccentRole = (typeof ACCENT_ROLES)[number];
 
-function accentCost(role: "temperature" | "rain" | "wind", hex: string): number {
-  if (role === "wind") return WIND_COST;
-  if (chroma(hex) < 0.12) return 180;
-  return hueDistance(hexToHue(hex), ACCENT_TARGET_HUE[role]);
+// Leftover accents go to wind; this bias keeps temperature and rain filled first.
+const WIND_COST = 60;
+const GREY_COST = 180;
+// Only reached when there are fewer pasted colours than accent roles.
+const KEEP_CURRENT_COST = 1000;
+// Lines below this contrast against the background get harder to read.
+const LEGIBLE_CONTRAST = 3;
+const ILLEGIBLE_COST_PER_RATIO = 30;
+// The daytime colour fills the whole condition strip, so it must stay close to the background.
+const MAX_DAYTIME_CONTRAST = 2.2;
+const DAYTIME_CONTRAST_COST = 40;
+const GENERATED_DAYTIME_COST = 20;
+
+function accentCost(role: AccentRole, hex: string, background: string): number {
+  const contrast = contrastRatio(hex, background);
+  // Small contrast term breaks ties toward the more visible colour.
+  const legibility = ILLEGIBLE_COST_PER_RATIO * Math.max(0, LEGIBLE_CONTRAST - contrast) - contrast;
+  if (role === "wind") return WIND_COST + legibility;
+  if (chroma(hex) < 0.12) return GREY_COST + legibility;
+  return hueDistance(hexToHue(hex), ACCENT_TARGET_HUE[role]) + legibility;
 }
 
-function assignAccents(accents: string[]): { cost: number; map: Partial<PaletteColors> } {
-  const roles = ["temperature", "rain", "wind"] as const;
+/** Pick up to three of `candidates` for temperature, rain and wind at the lowest total cost. */
+function assignAccents(
+  candidates: string[],
+  background: string
+): { cost: number; map: Partial<PaletteColors> } {
   const best = { cost: Infinity, map: {} as Partial<PaletteColors> };
 
   const search = (idx: number, used: Set<string>, cost: number, map: Partial<PaletteColors>) => {
-    if (idx === accents.length) {
-      if (cost < best.cost) {
-        best.cost = cost;
-        best.map = { ...map };
-      }
+    if (cost >= best.cost) return;
+    if (idx === ACCENT_ROLES.length) {
+      best.cost = cost;
+      best.map = { ...map };
       return;
     }
-    for (const role of roles) {
-      if (used.has(role)) continue;
-      used.add(role);
-      map[role] = accents[idx];
-      search(idx + 1, used, cost + accentCost(role, accents[idx]), map);
+    const role = ACCENT_ROLES[idx];
+    for (const hex of candidates) {
+      if (used.has(hex)) continue;
+      used.add(hex);
+      map[role] = hex;
+      search(idx + 1, used, cost + accentCost(role, hex, background), map);
       delete map[role];
-      used.delete(role);
+      used.delete(hex);
     }
+    search(idx + 1, used, cost + KEEP_CURRENT_COST, map);
   };
   search(0, new Set(), 0, {});
   return best;
@@ -161,37 +179,35 @@ function assignAccents(accents: string[]): { cost: number; map: Partial<PaletteC
 
 function autoAssign(list: string[], current: PaletteColors): PaletteColors {
   const unique = [...new Set(list)];
-  // The background is whichever colour leaves the three strongest accents most legible.
+  // The background is whichever colour leaves the three strongest others most legible,
+  // with a slight preference for darker backgrounds on ties.
   const legibility = (candidate: string) => {
     const others = unique
       .filter((c) => c !== candidate)
       .map((c) => contrastRatio(c, candidate))
       .sort((a, b) => b - a)
       .slice(0, 3);
-    return others.length ? others.reduce((sum, v) => sum + v, 0) / others.length : 0;
+    const mean = others.length ? others.reduce((sum, v) => sum + v, 0) / others.length : 0;
+    return mean - relativeLuminance(candidate) * 0.01;
   };
   const background = unique.reduce((a, b) => (legibility(b) > legibility(a) ? b : a));
   const remaining = unique.filter((c) => c !== background);
 
-  const strongest = (colors: string[]) =>
-    [...colors]
-      .sort((a, b) => contrastRatio(b, background) - contrastRatio(a, background))
-      .slice(0, 3);
-
   let daytime = autoDaytimeColor(background);
-  let accents = assignAccents(strongest(remaining));
-  if (remaining.length > 3) {
-    // Daytime shading should be subtle, but not at the cost of e.g. the only blue
-    // that could represent rain, so it is chosen jointly with the accents.
-    let bestCost = Infinity;
-    for (const candidate of remaining) {
-      const option = assignAccents(strongest(remaining.filter((c) => c !== candidate)));
-      const cost = option.cost + DAYTIME_CONTRAST_COST * (contrastRatio(candidate, background) - 1);
-      if (cost < bestCost) {
-        bestCost = cost;
-        daytime = candidate;
-        accents = option;
-      }
+  let accents = assignAccents(remaining, background);
+  let bestCost = accents.cost + GENERATED_DAYTIME_COST;
+  for (const candidate of remaining) {
+    const contrast = contrastRatio(candidate, background);
+    if (contrast > MAX_DAYTIME_CONTRAST) continue;
+    const option = assignAccents(
+      remaining.filter((c) => c !== candidate),
+      background
+    );
+    const cost = option.cost + DAYTIME_CONTRAST_COST * (contrast - 1);
+    if (cost < bestCost) {
+      bestCost = cost;
+      daytime = candidate;
+      accents = option;
     }
   }
 

@@ -90,8 +90,21 @@ describe("assignPaletteColors", () => {
     expect(colors.background).toBe("#264653");
     expect(colors.temperature).toBe("#f4a261");
     expect(colors.rain).toBe("#2a9d8f");
-    expect(new Set([colors.daytime, colors.wind])).toEqual(new Set(["#e76f51", "#e9c46a"]));
+    expect(colors.wind).toBe("#e9c46a");
+    // None of the pasted colours is subtle enough to fill the condition strip.
+    expect(contrastRatio(colors.daytime, colors.background)).toBeLessThan(1.6);
     expect(contrastRatio(colors.text, colors.background)).toBeGreaterThan(7);
+  });
+
+  it("uses a subtle pasted colour for daytime shading when there is one", () => {
+    const { colors } = assignPaletteColors(parsed("1b263b,243447,ff9f1c,2ec4b6,e0e1dd"), CURRENT);
+    expect(colors).toMatchObject({
+      background: "#1b263b",
+      daytime: "#243447",
+      temperature: "#ff9f1c",
+      rain: "#2ec4b6",
+      wind: "#e0e1dd",
+    });
   });
 
   it("uses every colour of the all-pastel example exactly once", () => {
