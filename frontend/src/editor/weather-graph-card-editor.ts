@@ -3,11 +3,13 @@ import {
   DEFAULT_PALETTE_ID,
   PALETTE_PRESETS,
   PALETTE_SLOTS,
+  type PaletteColors,
   type PaletteSlot,
   effectiveOverrides,
   getPalettePreset,
   resolvePalette,
 } from "../theme/palette";
+import { assignPaletteColors, paletteToCsv, parsePaletteInput } from "../theme/palette-import";
 import type { HomeAssistant, SummaryMetric, WeatherGraphCardConfig } from "../types";
 import {
   MAX_SUMMARY_METRICS,
@@ -15,20 +17,32 @@ import {
   normalizeSummaryMetrics,
 } from "../utils/summary-metrics";
 
+const PASTE_PLACEHOLDER = [
+  "c7eae4,a7e8bd,fcbcb8,efa7a7,ffd972",
+  "#c7eae4, #a7e8bd, #fcbcb8, #efa7a7, #ffd972",
+  '["c7eae4","a7e8bd","fcbcb8","efa7a7","ffd972"]',
+  '{"background":"c7eae4","rain":"efa7a7", ...}',
+].join("\n");
+
 export class WeatherGraphCardEditor extends LitElement {
   static properties: PropertyDeclarations = {
     hass: { attribute: false },
     _config: { state: true },
+    _pasteText: { state: true },
+    _pasteNote: { state: true },
   };
 
   declare hass?: HomeAssistant;
   declare private _config: WeatherGraphCardConfig;
+  declare private _pasteText: string;
+  declare private _pasteNote?: { kind: "error" | "success"; text: string };
 
   constructor() {
     super();
     this._config = {
       type: "custom:weather-graph-card",
     };
+    this._pasteText = "";
   }
 
   static styles = css`
@@ -159,6 +173,59 @@ export class WeatherGraphCardEditor extends LitElement {
       cursor: pointer;
     }
 
+    .paste-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .paste-box textarea {
+      min-height: 84px;
+      resize: vertical;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--divider-color, rgba(148, 163, 184, 0.3));
+      background: var(--card-background-color, #0f172a);
+      color: var(--primary-text-color, #f8fafc);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12.5px;
+      line-height: 1.45;
+    }
+
+    .paste-box textarea[aria-invalid="true"] {
+      border-color: var(--error-color, #ef4444);
+    }
+
+    .paste-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .paste-actions .spacer {
+      flex: 1;
+    }
+
+    .apply-btn {
+      background: var(--primary-color, #03a9f4);
+      border-color: transparent;
+      color: var(--text-primary-color, #ffffff);
+    }
+
+    .paste-note {
+      font-size: 12px;
+    }
+
+    .paste-note.error {
+      color: var(--error-color, #ef4444);
+    }
+
+    .paste-note.success {
+      color: var(--success-color, #22c55e);
+    }
+
     .revert-btn:disabled {
       opacity: 0.4;
       cursor: default;
@@ -221,6 +288,93 @@ export class WeatherGraphCardEditor extends LitElement {
       [slot]: value,
     });
     this._update("colors", Object.keys(overrides).length > 0 ? overrides : undefined);
+  }
+
+  private _applyColors(colors: PaletteColors): void {
+    const overrides = effectiveOverrides(this._config.palette, colors);
+    this._update("colors", Object.keys(overrides).length > 0 ? overrides : undefined);
+  }
+
+  private _applyPaste(): void {
+    const parsed = parsePaletteInput(this._pasteText);
+    if (!parsed.ok) {
+      this._pasteNote = { kind: "error", text: parsed.error };
+      return;
+    }
+    const current = resolvePalette(this._config.palette, this._config.colors);
+    const { colors, mode, count } = assignPaletteColors(parsed.input, current);
+    this._applyColors(colors);
+    this._pasteText = "";
+    const plural = count === 1 ? "colour" : "colours";
+    const text =
+      mode === "keyed"
+        ? `Applied ${count} ${plural} to the named slots.`
+        : mode === "ordered"
+          ? "Applied 6 colours in slot order."
+          : `${count} ${plural} auto-assigned. Drag swatches to rearrange.`;
+    this._pasteNote = { kind: "success", text };
+  }
+
+  private async _copyCurrent(): Promise<void> {
+    const csv = paletteToCsv(resolvePalette(this._config.palette, this._config.colors));
+    try {
+      await navigator.clipboard.writeText(csv);
+      this._pasteNote = { kind: "success", text: "Current palette copied as CSV." };
+    } catch {
+      // Clipboard access needs a secure context, which plain-http HA installs lack.
+      this._pasteText = csv;
+      this._pasteNote = { kind: "success", text: "Current palette placed in the box to copy." };
+      await this.updateComplete;
+      this.shadowRoot?.querySelector<HTMLTextAreaElement>("#wg-paste")?.select();
+    }
+  }
+
+  private _renderPasteBox() {
+    const invalid = this._pasteNote?.kind === "error";
+    return html`
+      <div class="paste-box">
+        <label for="wg-paste">Paste a Palette</label>
+        <textarea
+          id="wg-paste"
+          spellcheck="false"
+          aria-invalid=${invalid ? "true" : "false"}
+          aria-describedby="wg-paste-note"
+          placeholder=${PASTE_PLACEHOLDER}
+          .value=${this._pasteText}
+          @input=${(e: Event) => {
+            this._pasteText = (e.target as HTMLTextAreaElement).value;
+            if (invalid) this._pasteNote = undefined;
+          }}
+          @keydown=${(e: KeyboardEvent) => {
+            if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+              e.preventDefault();
+              this._applyPaste();
+            }
+          }}
+        ></textarea>
+        <div class="paste-actions">
+          <button
+            type="button"
+            class="revert-btn apply-btn"
+            ?disabled=${!this._pasteText.trim()}
+            @click=${() => this._applyPaste()}
+          >
+            Apply
+          </button>
+          <button type="button" class="revert-btn" @click=${() => this._copyCurrent()}>
+            Copy current
+          </button>
+          <span class="spacer"></span>
+          <span id="wg-paste-note" class="paste-note ${this._pasteNote?.kind ?? ""}" role="status">
+            ${this._pasteNote?.text ?? ""}
+          </span>
+        </div>
+        <span class="hint">
+          CSV, JSON, or any text with hex codes, such as a Coolors link. Five colours are
+          auto-assigned; six fill the slots in order. Ctrl/⌘+Enter applies.
+        </span>
+      </div>
+    `;
   }
 
   private _renderMetricsSection() {
@@ -314,6 +468,7 @@ export class WeatherGraphCardEditor extends LitElement {
         <span class="hint">
           Pick a built-in palette, then adjust any colour. Changing palette clears custom colours.
         </span>
+        ${this._renderPasteBox()}
       </div>
     `;
   }
