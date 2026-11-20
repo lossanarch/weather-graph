@@ -3,18 +3,18 @@
  * Copyright 2019 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const it = globalThis, bt = it.ShadowRoot && (it.ShadyCSS === void 0 || it.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, vt = Symbol(), Nt = /* @__PURE__ */ new WeakMap();
-let Vt = class {
+const ct = globalThis, Rt = ct.ShadowRoot && (ct.ShadyCSS === void 0 || ct.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, Ht = Symbol(), jt = /* @__PURE__ */ new WeakMap();
+let le = class {
   constructor(t, e, i) {
-    if (this._$cssResult$ = !0, i !== vt) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
+    if (this._$cssResult$ = !0, i !== Ht) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
     this.cssText = t, this.t = e;
   }
   get styleSheet() {
     let t = this.o;
     const e = this.t;
-    if (bt && t === void 0) {
+    if (Rt && t === void 0) {
       const i = e !== void 0 && e.length === 1;
-      i && (t = Nt.get(e)), t === void 0 && ((this.o = t = new CSSStyleSheet()).replaceSync(this.cssText), i && Nt.set(e, t));
+      i && (t = jt.get(e)), t === void 0 && ((this.o = t = new CSSStyleSheet()).replaceSync(this.cssText), i && jt.set(e, t));
     }
     return t;
   }
@@ -22,33 +22,33 @@ let Vt = class {
     return this.cssText;
   }
 };
-const le = (s) => new Vt(typeof s == "string" ? s : s + "", void 0, vt), St = (s, ...t) => {
+const ve = (s) => new le(typeof s == "string" ? s : s + "", void 0, Ht), Ut = (s, ...t) => {
   const e = s.length === 1 ? s[0] : t.reduce((i, n, r) => i + ((o) => {
     if (o._$cssResult$ === !0) return o.cssText;
     if (typeof o == "number") return o;
     throw Error("Value passed to 'css' function must be a 'css' function result: " + o + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
   })(n) + s[r + 1], s[0]);
-  return new Vt(e, s, vt);
-}, ce = (s, t) => {
-  if (bt) s.adoptedStyleSheets = t.map((e) => e instanceof CSSStyleSheet ? e : e.styleSheet);
+  return new le(e, s, Ht);
+}, ke = (s, t) => {
+  if (Rt) s.adoptedStyleSheets = t.map((e) => e instanceof CSSStyleSheet ? e : e.styleSheet);
   else for (const e of t) {
-    const i = document.createElement("style"), n = it.litNonce;
+    const i = document.createElement("style"), n = ct.litNonce;
     n !== void 0 && i.setAttribute("nonce", n), i.textContent = e.cssText, s.appendChild(i);
   }
-}, Pt = bt ? (s) => s : (s) => s instanceof CSSStyleSheet ? ((t) => {
+}, Vt = Rt ? (s) => s : (s) => s instanceof CSSStyleSheet ? ((t) => {
   let e = "";
   for (const i of t.cssRules) e += i.cssText;
-  return le(e);
+  return ve(e);
 })(s) : s;
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const { is: he, defineProperty: de, getOwnPropertyDescriptor: ue, getOwnPropertyNames: pe, getOwnPropertySymbols: ge, getPrototypeOf: fe } = Object, T = globalThis, It = T.trustedTypes, me = It ? It.emptyScript : "", ht = T.reactiveElementPolyfillSupport, G = (s, t) => s, wt = { toAttribute(s, t) {
+const { is: Se, defineProperty: Ae, getOwnPropertyDescriptor: Me, getOwnPropertyNames: Ee, getOwnPropertySymbols: Ce, getPrototypeOf: Te } = Object, D = globalThis, Zt = D.trustedTypes, Ne = Zt ? Zt.emptyScript : "", yt = D.reactiveElementPolyfillSupport, it = (s, t) => s, Mt = { toAttribute(s, t) {
   switch (t) {
     case Boolean:
-      s = s ? me : null;
+      s = s ? Ne : null;
       break;
     case Object:
     case Array:
@@ -73,23 +73,23 @@ const { is: he, defineProperty: de, getOwnPropertyDescriptor: ue, getOwnProperty
       }
   }
   return e;
-} }, Ot = (s, t) => !he(s, t), Tt = { attribute: !0, type: String, converter: wt, reflect: !1, useDefault: !1, hasChanged: Ot };
-Symbol.metadata ?? (Symbol.metadata = Symbol("metadata")), T.litPropertyMetadata ?? (T.litPropertyMetadata = /* @__PURE__ */ new WeakMap());
-let B = class extends HTMLElement {
+} }, ce = (s, t) => !Se(s, t), Gt = { attribute: !0, type: String, converter: Mt, reflect: !1, useDefault: !1, hasChanged: ce };
+Symbol.metadata ?? (Symbol.metadata = Symbol("metadata")), D.litPropertyMetadata ?? (D.litPropertyMetadata = /* @__PURE__ */ new WeakMap());
+let G = class extends HTMLElement {
   static addInitializer(t) {
     this._$Ei(), (this.l ?? (this.l = [])).push(t);
   }
   static get observedAttributes() {
     return this.finalize(), this._$Eh && [...this._$Eh.keys()];
   }
-  static createProperty(t, e = Tt) {
+  static createProperty(t, e = Gt) {
     if (e.state && (e.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(t) && ((e = Object.create(e)).wrapped = !0), this.elementProperties.set(t, e), !e.noAccessor) {
       const i = Symbol(), n = this.getPropertyDescriptor(t, i, e);
-      n !== void 0 && de(this.prototype, t, n);
+      n !== void 0 && Ae(this.prototype, t, n);
     }
   }
   static getPropertyDescriptor(t, e, i) {
-    const { get: n, set: r } = ue(this.prototype, t) ?? { get() {
+    const { get: n, set: r } = Me(this.prototype, t) ?? { get() {
       return this[e];
     }, set(o) {
       this[e] = o;
@@ -100,17 +100,17 @@ let B = class extends HTMLElement {
     }, configurable: !0, enumerable: !0 };
   }
   static getPropertyOptions(t) {
-    return this.elementProperties.get(t) ?? Tt;
+    return this.elementProperties.get(t) ?? Gt;
   }
   static _$Ei() {
-    if (this.hasOwnProperty(G("elementProperties"))) return;
-    const t = fe(this);
+    if (this.hasOwnProperty(it("elementProperties"))) return;
+    const t = Te(this);
     t.finalize(), t.l !== void 0 && (this.l = [...t.l]), this.elementProperties = new Map(t.elementProperties);
   }
   static finalize() {
-    if (this.hasOwnProperty(G("finalized"))) return;
-    if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(G("properties"))) {
-      const e = this.properties, i = [...pe(e), ...ge(e)];
+    if (this.hasOwnProperty(it("finalized"))) return;
+    if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(it("properties"))) {
+      const e = this.properties, i = [...Ee(e), ...Ce(e)];
       for (const n of i) this.createProperty(n, e[n]);
     }
     const t = this[Symbol.metadata];
@@ -129,8 +129,8 @@ let B = class extends HTMLElement {
     const e = [];
     if (Array.isArray(t)) {
       const i = new Set(t.flat(1 / 0).reverse());
-      for (const n of i) e.unshift(Pt(n));
-    } else t !== void 0 && e.push(Pt(t));
+      for (const n of i) e.unshift(Vt(n));
+    } else t !== void 0 && e.push(Vt(t));
     return e;
   }
   static _$Eu(t, e) {
@@ -159,7 +159,7 @@ let B = class extends HTMLElement {
   }
   createRenderRoot() {
     const t = this.shadowRoot ?? this.attachShadow(this.constructor.shadowRootOptions);
-    return ce(t, this.constructor.elementStyles), t;
+    return ke(t, this.constructor.elementStyles), t;
   }
   connectedCallback() {
     var t;
@@ -184,7 +184,7 @@ let B = class extends HTMLElement {
     var r;
     const i = this.constructor.elementProperties.get(t), n = this.constructor._$Eu(t, i);
     if (n !== void 0 && i.reflect === !0) {
-      const o = (((r = i.converter) == null ? void 0 : r.toAttribute) !== void 0 ? i.converter : wt).toAttribute(e, i.type);
+      const o = (((r = i.converter) == null ? void 0 : r.toAttribute) !== void 0 ? i.converter : Mt).toAttribute(e, i.type);
       this._$Em = t, o == null ? this.removeAttribute(n) : this.setAttribute(n, o), this._$Em = null;
     }
   }
@@ -192,17 +192,17 @@ let B = class extends HTMLElement {
     var r, o;
     const i = this.constructor, n = i._$Eh.get(t);
     if (n !== void 0 && this._$Em !== n) {
-      const a = i.getPropertyOptions(n), l = typeof a.converter == "function" ? { fromAttribute: a.converter } : ((r = a.converter) == null ? void 0 : r.fromAttribute) !== void 0 ? a.converter : wt;
+      const a = i.getPropertyOptions(n), c = typeof a.converter == "function" ? { fromAttribute: a.converter } : ((r = a.converter) == null ? void 0 : r.fromAttribute) !== void 0 ? a.converter : Mt;
       this._$Em = n;
-      const h = l.fromAttribute(e, a.type);
-      this[n] = h ?? ((o = this._$Ej) == null ? void 0 : o.get(n)) ?? h, this._$Em = null;
+      const l = c.fromAttribute(e, a.type);
+      this[n] = l ?? ((o = this._$Ej) == null ? void 0 : o.get(n)) ?? l, this._$Em = null;
     }
   }
   requestUpdate(t, e, i, n = !1, r) {
     var o;
     if (t !== void 0) {
       const a = this.constructor;
-      if (n === !1 && (r = this[t]), i ?? (i = a.getPropertyOptions(t)), !((i.hasChanged ?? Ot)(r, e) || i.useDefault && i.reflect && r === ((o = this._$Ej) == null ? void 0 : o.get(t)) && !this.hasAttribute(a._$Eu(t, i)))) return;
+      if (n === !1 && (r = this[t]), i ?? (i = a.getPropertyOptions(t)), !((i.hasChanged ?? ce)(r, e) || i.useDefault && i.reflect && r === ((o = this._$Ej) == null ? void 0 : o.get(t)) && !this.hasAttribute(a._$Eu(t, i)))) return;
       this.C(t, e, i);
     }
     this.isUpdatePending === !1 && (this._$ES = this._$EP());
@@ -233,8 +233,8 @@ let B = class extends HTMLElement {
       }
       const n = this.constructor.elementProperties;
       if (n.size > 0) for (const [r, o] of n) {
-        const { wrapped: a } = o, l = this[r];
-        a !== !0 || this._$AL.has(r) || l === void 0 || this.C(r, void 0, o, l);
+        const { wrapped: a } = o, c = this[r];
+        a !== !0 || this._$AL.has(r) || c === void 0 || this.C(r, void 0, o, c);
       }
     }
     let t = !1;
@@ -278,76 +278,76 @@ let B = class extends HTMLElement {
   firstUpdated(t) {
   }
 };
-B.elementStyles = [], B.shadowRootOptions = { mode: "open" }, B[G("elementProperties")] = /* @__PURE__ */ new Map(), B[G("finalized")] = /* @__PURE__ */ new Map(), ht == null || ht({ ReactiveElement: B }), (T.reactiveElementVersions ?? (T.reactiveElementVersions = [])).push("2.1.2");
+G.elementStyles = [], G.shadowRootOptions = { mode: "open" }, G[it("elementProperties")] = /* @__PURE__ */ new Map(), G[it("finalized")] = /* @__PURE__ */ new Map(), yt == null || yt({ ReactiveElement: G }), (D.reactiveElementVersions ?? (D.reactiveElementVersions = [])).push("2.1.2");
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const K = globalThis, Ht = (s) => s, nt = K.trustedTypes, Rt = nt ? nt.createPolicy("lit-html", { createHTML: (s) => s }) : void 0, Gt = "$lit$", I = `lit$${Math.random().toFixed(9).slice(2)}$`, Kt = "?" + I, _e = `<${Kt}>`, W = document, q = () => W.createComment(""), J = (s) => s === null || typeof s != "object" && typeof s != "function", At = Array.isArray, we = (s) => At(s) || typeof (s == null ? void 0 : s[Symbol.iterator]) == "function", dt = `[ 	
-\f\r]`, j = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Dt = /-->/g, Ut = />/g, H = RegExp(`>|${dt}(?:([^\\s"'>=/]+)(${dt}*=${dt}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), Wt = /'/g, Lt = /"/g, qt = /^(?:script|style|textarea|title)$/i, Jt = (s) => (t, ...e) => ({ _$litType$: s, strings: t, values: e }), A = Jt(1), w = Jt(2), F = Symbol.for("lit-noChange"), x = Symbol.for("lit-nothing"), zt = /* @__PURE__ */ new WeakMap(), R = W.createTreeWalker(W, 129);
-function Yt(s, t) {
-  if (!At(s) || !s.hasOwnProperty("raw")) throw Error("invalid template strings array");
-  return Rt !== void 0 ? Rt.createHTML(t) : t;
+const st = globalThis, Kt = (s) => s, dt = st.trustedTypes, qt = dt ? dt.createPolicy("lit-html", { createHTML: (s) => s }) : void 0, he = "$lit$", U = `lit$${Math.random().toFixed(9).slice(2)}$`, de = "?" + U, Pe = `<${de}>`, B = document, nt = () => B.createComment(""), rt = (s) => s === null || typeof s != "object" && typeof s != "function", Dt = Array.isArray, Ie = (s) => Dt(s) || typeof (s == null ? void 0 : s[Symbol.iterator]) == "function", $t = `[ 	
+\f\r]`, J = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Yt = /-->/g, Jt = />/g, L = RegExp(`>|${$t}(?:([^\\s"'>=/]+)(${$t}*=${$t}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Qt = /'/g, te = /"/g, ue = /^(?:script|style|textarea|title)$/i, pe = (s) => (t, ...e) => ({ _$litType$: s, strings: t, values: e }), $ = pe(1), w = pe(2), X = Symbol.for("lit-noChange"), b = Symbol.for("lit-nothing"), ee = /* @__PURE__ */ new WeakMap(), O = B.createTreeWalker(B, 129);
+function ge(s, t) {
+  if (!Dt(s) || !s.hasOwnProperty("raw")) throw Error("invalid template strings array");
+  return qt !== void 0 ? qt.createHTML(t) : t;
 }
-const ye = (s, t) => {
+const Re = (s, t) => {
   const e = s.length - 1, i = [];
-  let n, r = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", o = j;
+  let n, r = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", o = J;
   for (let a = 0; a < e; a++) {
-    const l = s[a];
-    let h, u, c = -1, f = 0;
-    for (; f < l.length && (o.lastIndex = f, u = o.exec(l), u !== null); ) f = o.lastIndex, o === j ? u[1] === "!--" ? o = Dt : u[1] !== void 0 ? o = Ut : u[2] !== void 0 ? (qt.test(u[2]) && (n = RegExp("</" + u[2], "g")), o = H) : u[3] !== void 0 && (o = H) : o === H ? u[0] === ">" ? (o = n ?? j, c = -1) : u[1] === void 0 ? c = -2 : (c = o.lastIndex - u[2].length, h = u[1], o = u[3] === void 0 ? H : u[3] === '"' ? Lt : Wt) : o === Lt || o === Wt ? o = H : o === Dt || o === Ut ? o = j : (o = H, n = void 0);
-    const _ = o === H && s[a + 1].startsWith("/>") ? " " : "";
-    r += o === j ? l + _e : c >= 0 ? (i.push(h), l.slice(0, c) + Gt + l.slice(c) + I + _) : l + I + (c === -2 ? a : _);
+    const c = s[a];
+    let l, d, h = -1, g = 0;
+    for (; g < c.length && (o.lastIndex = g, d = o.exec(c), d !== null); ) g = o.lastIndex, o === J ? d[1] === "!--" ? o = Yt : d[1] !== void 0 ? o = Jt : d[2] !== void 0 ? (ue.test(d[2]) && (n = RegExp("</" + d[2], "g")), o = L) : d[3] !== void 0 && (o = L) : o === L ? d[0] === ">" ? (o = n ?? J, h = -1) : d[1] === void 0 ? h = -2 : (h = o.lastIndex - d[2].length, l = d[1], o = d[3] === void 0 ? L : d[3] === '"' ? te : Qt) : o === te || o === Qt ? o = L : o === Yt || o === Jt ? o = J : (o = L, n = void 0);
+    const _ = o === L && s[a + 1].startsWith("/>") ? " " : "";
+    r += o === J ? c + Pe : h >= 0 ? (i.push(l), c.slice(0, h) + he + c.slice(h) + U + _) : c + U + (h === -2 ? a : _);
   }
-  return [Yt(s, r + (s[e] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), i];
+  return [ge(s, r + (s[e] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), i];
 };
-class Y {
+class ot {
   constructor({ strings: t, _$litType$: e }, i) {
     let n;
     this.parts = [];
     let r = 0, o = 0;
-    const a = t.length - 1, l = this.parts, [h, u] = ye(t, e);
-    if (this.el = Y.createElement(h, i), R.currentNode = this.el.content, e === 2 || e === 3) {
-      const c = this.el.content.firstChild;
-      c.replaceWith(...c.childNodes);
+    const a = t.length - 1, c = this.parts, [l, d] = Re(t, e);
+    if (this.el = ot.createElement(l, i), O.currentNode = this.el.content, e === 2 || e === 3) {
+      const h = this.el.content.firstChild;
+      h.replaceWith(...h.childNodes);
     }
-    for (; (n = R.nextNode()) !== null && l.length < a; ) {
+    for (; (n = O.nextNode()) !== null && c.length < a; ) {
       if (n.nodeType === 1) {
-        if (n.hasAttributes()) for (const c of n.getAttributeNames()) if (c.endsWith(Gt)) {
-          const f = u[o++], _ = n.getAttribute(c).split(I), p = /([.?@])?(.*)/.exec(f);
-          l.push({ type: 1, index: r, name: p[2], strings: _, ctor: p[1] === "." ? xe : p[1] === "?" ? be : p[1] === "@" ? ve : ct }), n.removeAttribute(c);
-        } else c.startsWith(I) && (l.push({ type: 6, index: r }), n.removeAttribute(c));
-        if (qt.test(n.tagName)) {
-          const c = n.textContent.split(I), f = c.length - 1;
-          if (f > 0) {
-            n.textContent = nt ? nt.emptyScript : "";
-            for (let _ = 0; _ < f; _++) n.append(c[_], q()), R.nextNode(), l.push({ type: 2, index: ++r });
-            n.append(c[f], q());
+        if (n.hasAttributes()) for (const h of n.getAttributeNames()) if (h.endsWith(he)) {
+          const g = d[o++], _ = n.getAttribute(h).split(U), u = /([.?@])?(.*)/.exec(g);
+          c.push({ type: 1, index: r, name: u[2], strings: _, ctor: u[1] === "." ? Ue : u[1] === "?" ? De : u[1] === "@" ? We : wt }), n.removeAttribute(h);
+        } else h.startsWith(U) && (c.push({ type: 6, index: r }), n.removeAttribute(h));
+        if (ue.test(n.tagName)) {
+          const h = n.textContent.split(U), g = h.length - 1;
+          if (g > 0) {
+            n.textContent = dt ? dt.emptyScript : "";
+            for (let _ = 0; _ < g; _++) n.append(h[_], nt()), O.nextNode(), c.push({ type: 2, index: ++r });
+            n.append(h[g], nt());
           }
         }
-      } else if (n.nodeType === 8) if (n.data === Kt) l.push({ type: 2, index: r });
+      } else if (n.nodeType === 8) if (n.data === de) c.push({ type: 2, index: r });
       else {
-        let c = -1;
-        for (; (c = n.data.indexOf(I, c + 1)) !== -1; ) l.push({ type: 7, index: r }), c += I.length - 1;
+        let h = -1;
+        for (; (h = n.data.indexOf(U, h + 1)) !== -1; ) c.push({ type: 7, index: r }), h += U.length - 1;
       }
       r++;
     }
   }
   static createElement(t, e) {
-    const i = W.createElement("template");
+    const i = B.createElement("template");
     return i.innerHTML = t, i;
   }
 }
-function X(s, t, e = s, i) {
+function K(s, t, e = s, i) {
   var o, a;
-  if (t === F) return t;
+  if (t === X) return t;
   let n = i !== void 0 ? (o = e._$Co) == null ? void 0 : o[i] : e._$Cl;
-  const r = J(t) ? void 0 : t._$litDirective$;
-  return (n == null ? void 0 : n.constructor) !== r && ((a = n == null ? void 0 : n._$AO) == null || a.call(n, !1), r === void 0 ? n = void 0 : (n = new r(s), n._$AT(s, e, i)), i !== void 0 ? (e._$Co ?? (e._$Co = []))[i] = n : e._$Cl = n), n !== void 0 && (t = X(s, n._$AS(s, t.values), n, i)), t;
+  const r = rt(t) ? void 0 : t._$litDirective$;
+  return (n == null ? void 0 : n.constructor) !== r && ((a = n == null ? void 0 : n._$AO) == null || a.call(n, !1), r === void 0 ? n = void 0 : (n = new r(s), n._$AT(s, e, i)), i !== void 0 ? (e._$Co ?? (e._$Co = []))[i] = n : e._$Cl = n), n !== void 0 && (t = K(s, n._$AS(s, t.values), n, i)), t;
 }
-class $e {
+class He {
   constructor(t, e) {
     this._$AV = [], this._$AN = void 0, this._$AD = t, this._$AM = e;
   }
@@ -358,30 +358,30 @@ class $e {
     return this._$AM._$AU;
   }
   u(t) {
-    const { el: { content: e }, parts: i } = this._$AD, n = ((t == null ? void 0 : t.creationScope) ?? W).importNode(e, !0);
-    R.currentNode = n;
-    let r = R.nextNode(), o = 0, a = 0, l = i[0];
-    for (; l !== void 0; ) {
-      if (o === l.index) {
-        let h;
-        l.type === 2 ? h = new Q(r, r.nextSibling, this, t) : l.type === 1 ? h = new l.ctor(r, l.name, l.strings, this, t) : l.type === 6 && (h = new Se(r, this, t)), this._$AV.push(h), l = i[++a];
+    const { el: { content: e }, parts: i } = this._$AD, n = ((t == null ? void 0 : t.creationScope) ?? B).importNode(e, !0);
+    O.currentNode = n;
+    let r = O.nextNode(), o = 0, a = 0, c = i[0];
+    for (; c !== void 0; ) {
+      if (o === c.index) {
+        let l;
+        c.type === 2 ? l = new at(r, r.nextSibling, this, t) : c.type === 1 ? l = new c.ctor(r, c.name, c.strings, this, t) : c.type === 6 && (l = new Le(r, this, t)), this._$AV.push(l), c = i[++a];
       }
-      o !== (l == null ? void 0 : l.index) && (r = R.nextNode(), o++);
+      o !== (c == null ? void 0 : c.index) && (r = O.nextNode(), o++);
     }
-    return R.currentNode = W, n;
+    return O.currentNode = B, n;
   }
   p(t) {
     let e = 0;
     for (const i of this._$AV) i !== void 0 && (i.strings !== void 0 ? (i._$AI(t, i, e), e += i.strings.length - 2) : i._$AI(t[e])), e++;
   }
 }
-class Q {
+class at {
   get _$AU() {
     var t;
     return ((t = this._$AM) == null ? void 0 : t._$AU) ?? this._$Cv;
   }
   constructor(t, e, i, n) {
-    this.type = 2, this._$AH = x, this._$AN = void 0, this._$AA = t, this._$AB = e, this._$AM = i, this.options = n, this._$Cv = (n == null ? void 0 : n.isConnected) ?? !0;
+    this.type = 2, this._$AH = b, this._$AN = void 0, this._$AA = t, this._$AB = e, this._$AM = i, this.options = n, this._$Cv = (n == null ? void 0 : n.isConnected) ?? !0;
   }
   get parentNode() {
     let t = this._$AA.parentNode;
@@ -395,7 +395,7 @@ class Q {
     return this._$AB;
   }
   _$AI(t, e = this) {
-    t = X(this, t, e), J(t) ? t === x || t == null || t === "" ? (this._$AH !== x && this._$AR(), this._$AH = x) : t !== this._$AH && t !== F && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : we(t) ? this.k(t) : this._(t);
+    t = K(this, t, e), rt(t) ? t === b || t == null || t === "" ? (this._$AH !== b && this._$AR(), this._$AH = b) : t !== this._$AH && t !== X && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : Ie(t) ? this.k(t) : this._(t);
   }
   O(t) {
     return this._$AA.parentNode.insertBefore(t, this._$AB);
@@ -404,33 +404,33 @@ class Q {
     this._$AH !== t && (this._$AR(), this._$AH = this.O(t));
   }
   _(t) {
-    this._$AH !== x && J(this._$AH) ? this._$AA.nextSibling.data = t : this.T(W.createTextNode(t)), this._$AH = t;
+    this._$AH !== b && rt(this._$AH) ? this._$AA.nextSibling.data = t : this.T(B.createTextNode(t)), this._$AH = t;
   }
   $(t) {
     var r;
-    const { values: e, _$litType$: i } = t, n = typeof i == "number" ? this._$AC(t) : (i.el === void 0 && (i.el = Y.createElement(Yt(i.h, i.h[0]), this.options)), i);
+    const { values: e, _$litType$: i } = t, n = typeof i == "number" ? this._$AC(t) : (i.el === void 0 && (i.el = ot.createElement(ge(i.h, i.h[0]), this.options)), i);
     if (((r = this._$AH) == null ? void 0 : r._$AD) === n) this._$AH.p(e);
     else {
-      const o = new $e(n, this), a = o.u(this.options);
+      const o = new He(n, this), a = o.u(this.options);
       o.p(e), this.T(a), this._$AH = o;
     }
   }
   _$AC(t) {
-    let e = zt.get(t.strings);
-    return e === void 0 && zt.set(t.strings, e = new Y(t)), e;
+    let e = ee.get(t.strings);
+    return e === void 0 && ee.set(t.strings, e = new ot(t)), e;
   }
   k(t) {
-    At(this._$AH) || (this._$AH = [], this._$AR());
+    Dt(this._$AH) || (this._$AH = [], this._$AR());
     const e = this._$AH;
     let i, n = 0;
-    for (const r of t) n === e.length ? e.push(i = new Q(this.O(q()), this.O(q()), this, this.options)) : i = e[n], i._$AI(r), n++;
+    for (const r of t) n === e.length ? e.push(i = new at(this.O(nt()), this.O(nt()), this, this.options)) : i = e[n], i._$AI(r), n++;
     n < e.length && (this._$AR(i && i._$AB.nextSibling, n), e.length = n);
   }
   _$AR(t = this._$AA.nextSibling, e) {
     var i;
     for ((i = this._$AP) == null ? void 0 : i.call(this, !1, !0, e); t !== this._$AB; ) {
-      const n = Ht(t).nextSibling;
-      Ht(t).remove(), t = n;
+      const n = Kt(t).nextSibling;
+      Kt(t).remove(), t = n;
     }
   }
   setConnected(t) {
@@ -438,7 +438,7 @@ class Q {
     this._$AM === void 0 && (this._$Cv = t, (e = this._$AP) == null || e.call(this, t));
   }
 }
-class ct {
+class wt {
   get tagName() {
     return this.element.tagName;
   }
@@ -446,46 +446,46 @@ class ct {
     return this._$AM._$AU;
   }
   constructor(t, e, i, n, r) {
-    this.type = 1, this._$AH = x, this._$AN = void 0, this.element = t, this.name = e, this._$AM = n, this.options = r, i.length > 2 || i[0] !== "" || i[1] !== "" ? (this._$AH = Array(i.length - 1).fill(new String()), this.strings = i) : this._$AH = x;
+    this.type = 1, this._$AH = b, this._$AN = void 0, this.element = t, this.name = e, this._$AM = n, this.options = r, i.length > 2 || i[0] !== "" || i[1] !== "" ? (this._$AH = Array(i.length - 1).fill(new String()), this.strings = i) : this._$AH = b;
   }
   _$AI(t, e = this, i, n) {
     const r = this.strings;
     let o = !1;
-    if (r === void 0) t = X(this, t, e, 0), o = !J(t) || t !== this._$AH && t !== F, o && (this._$AH = t);
+    if (r === void 0) t = K(this, t, e, 0), o = !rt(t) || t !== this._$AH && t !== X, o && (this._$AH = t);
     else {
       const a = t;
-      let l, h;
-      for (t = r[0], l = 0; l < r.length - 1; l++) h = X(this, a[i + l], e, l), h === F && (h = this._$AH[l]), o || (o = !J(h) || h !== this._$AH[l]), h === x ? t = x : t !== x && (t += (h ?? "") + r[l + 1]), this._$AH[l] = h;
+      let c, l;
+      for (t = r[0], c = 0; c < r.length - 1; c++) l = K(this, a[i + c], e, c), l === X && (l = this._$AH[c]), o || (o = !rt(l) || l !== this._$AH[c]), l === b ? t = b : t !== b && (t += (l ?? "") + r[c + 1]), this._$AH[c] = l;
     }
     o && !n && this.j(t);
   }
   j(t) {
-    t === x ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, t ?? "");
+    t === b ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, t ?? "");
   }
 }
-class xe extends ct {
+class Ue extends wt {
   constructor() {
     super(...arguments), this.type = 3;
   }
   j(t) {
-    this.element[this.name] = t === x ? void 0 : t;
+    this.element[this.name] = t === b ? void 0 : t;
   }
 }
-class be extends ct {
+class De extends wt {
   constructor() {
     super(...arguments), this.type = 4;
   }
   j(t) {
-    this.element.toggleAttribute(this.name, !!t && t !== x);
+    this.element.toggleAttribute(this.name, !!t && t !== b);
   }
 }
-class ve extends ct {
+class We extends wt {
   constructor(t, e, i, n, r) {
     super(t, e, i, n, r), this.type = 5;
   }
   _$AI(t, e = this) {
-    if ((t = X(this, t, e, 0) ?? x) === F) return;
-    const i = this._$AH, n = t === x && i !== x || t.capture !== i.capture || t.once !== i.once || t.passive !== i.passive, r = t !== x && (i === x || n);
+    if ((t = K(this, t, e, 0) ?? b) === X) return;
+    const i = this._$AH, n = t === b && i !== b || t.capture !== i.capture || t.once !== i.once || t.passive !== i.passive, r = t !== b && (i === b || n);
     n && this.element.removeEventListener(this.name, this, i), r && this.element.addEventListener(this.name, this, t), this._$AH = t;
   }
   handleEvent(t) {
@@ -493,7 +493,7 @@ class ve extends ct {
     typeof this._$AH == "function" ? this._$AH.call(((e = this.options) == null ? void 0 : e.host) ?? this.element, t) : this._$AH.handleEvent(t);
   }
 }
-class Se {
+class Le {
   constructor(t, e, i) {
     this.element = t, this.type = 6, this._$AN = void 0, this._$AM = e, this.options = i;
   }
@@ -501,17 +501,17 @@ class Se {
     return this._$AM._$AU;
   }
   _$AI(t) {
-    X(this, t);
+    K(this, t);
   }
 }
-const ut = K.litHtmlPolyfillSupport;
-ut == null || ut(Y, Q), (K.litHtmlVersions ?? (K.litHtmlVersions = [])).push("3.3.3");
-const Ae = (s, t, e) => {
+const xt = st.litHtmlPolyfillSupport;
+xt == null || xt(ot, at), (st.litHtmlVersions ?? (st.litHtmlVersions = [])).push("3.3.3");
+const Oe = (s, t, e) => {
   const i = (e == null ? void 0 : e.renderBefore) ?? t;
   let n = i._$litPart$;
   if (n === void 0) {
     const r = (e == null ? void 0 : e.renderBefore) ?? null;
-    i._$litPart$ = n = new Q(t.insertBefore(q(), r), r, void 0, e ?? {});
+    i._$litPart$ = n = new at(t.insertBefore(nt(), r), r, void 0, e ?? {});
   }
   return n._$AI(s), n;
 };
@@ -520,8 +520,8 @@ const Ae = (s, t, e) => {
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const D = globalThis;
-class U extends B {
+const z = globalThis;
+let F = class extends G {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
   }
@@ -532,7 +532,7 @@ class U extends B {
   }
   update(t) {
     const e = this.render();
-    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(t), this._$Do = Ae(e, this.renderRoot, this.renderOptions);
+    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(t), this._$Do = Oe(e, this.renderRoot, this.renderOptions);
   }
   connectedCallback() {
     var t;
@@ -543,15 +543,68 @@ class U extends B {
     super.disconnectedCallback(), (t = this._$Do) == null || t.setConnected(!1);
   }
   render() {
-    return F;
+    return X;
   }
-}
-var Zt;
-U._$litElement$ = !0, U.finalized = !0, (Zt = D.litElementHydrateSupport) == null || Zt.call(D, { LitElement: U });
-const pt = D.litElementPolyfillSupport;
-pt == null || pt({ LitElement: U });
-(D.litElementVersions ?? (D.litElementVersions = [])).push("4.2.2");
-function Qt(s, t, e) {
+};
+var ae;
+F._$litElement$ = !0, F.finalized = !0, (ae = z.litElementHydrateSupport) == null || ae.call(z, { LitElement: F });
+const bt = z.litElementPolyfillSupport;
+bt == null || bt({ LitElement: F });
+(z.litElementVersions ?? (z.litElementVersions = [])).push("4.2.2");
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const ze = { ATTRIBUTE: 1 }, Fe = (s) => (...t) => ({ _$litDirective$: s, values: t });
+let Be = class {
+  constructor(t) {
+  }
+  get _$AU() {
+    return this._$AM._$AU;
+  }
+  _$AT(t, e, i) {
+    this._$Ct = t, this._$AM = e, this._$Ci = i;
+  }
+  _$AS(t, e) {
+    return this.update(t, e);
+  }
+  update(t, e) {
+    return this.render(...e);
+  }
+};
+/**
+ * @license
+ * Copyright 2018 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const fe = "important", Xe = " !" + fe, je = Fe(class extends Be {
+  constructor(s) {
+    var t;
+    if (super(s), s.type !== ze.ATTRIBUTE || s.name !== "style" || ((t = s.strings) == null ? void 0 : t.length) > 2) throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
+  }
+  render(s) {
+    return Object.keys(s).reduce((t, e) => {
+      const i = s[e];
+      return i == null ? t : t + `${e = e.includes("-") ? e : e.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g, "-$&").toLowerCase()}:${i};`;
+    }, "");
+  }
+  update(s, [t]) {
+    const { style: e } = s.element;
+    if (this.ft === void 0) return this.ft = new Set(Object.keys(t)), this.render(t);
+    for (const i of this.ft) t[i] == null && (this.ft.delete(i), i.includes("-") ? e.removeProperty(i) : e[i] = null);
+    for (const i in t) {
+      const n = t[i];
+      if (n != null) {
+        this.ft.add(i);
+        const r = typeof n == "string" && n.endsWith(Xe);
+        i.includes("-") || r ? e.setProperty(i, r ? n.slice(0, -11) : n, r ? fe : "") : e[i] = n;
+      }
+    }
+    return X;
+  }
+});
+function me(s, t, e) {
   switch ((s ?? "").trim().toLowerCase()) {
     case "sunny":
       return e ? "clear-night" : "sunny";
@@ -623,7 +676,7 @@ function Qt(s, t, e) {
       return e ? "partly-cloudy-night" : "partly-cloudy-day";
   }
 }
-const Z = (s = 16, t = 15, e = 7.2) => w`
+const Q = (s = 16, t = 15, e = 7.2) => w`
   <g>
     <g stroke="#f6bd2b" stroke-width="2.1" stroke-linecap="round">
       <line x1=${s} y1=${t - e - 4.2} x2=${s} y2=${t - e - 1.8} />
@@ -637,55 +690,55 @@ const Z = (s = 16, t = 15, e = 7.2) => w`
     </g>
     <circle cx=${s} cy=${t} r=${e} fill="#f8c630" />
   </g>
-`, gt = (s = 0, t = 0) => w`
+`, vt = (s = 0, t = 0) => w`
   <path
     transform="translate(${s}, ${t})"
     d="M18.2 7.2A8.3 8.3 0 0 0 10.6 18.8 8.4 8.4 0 0 0 22.4 20.1 6.9 6.9 0 0 1 18.2 7.2Z"
     fill="#9eb1c4"
   />
-`, k = (s = 0, t = 0) => w`
+`, C = (s = 0, t = 0) => w`
   <path
     transform="translate(${s}, ${t})"
     d="M13.2 26.8H29.4A5.4 5.4 0 0 0 30.1 16.1 7.6 7.6 0 0 0 15.6 14.3 6.2 6.2 0 0 0 13.2 26.8Z"
     fill="#f1f5f9"
   />
-`, L = (s = 0, t = 0) => w`
+`, V = (s = 0, t = 0) => w`
   <path
     transform="translate(${s}, ${t})"
     d="M9.5 23.6H23.2A4.6 4.6 0 0 0 23.8 14.5 6.4 6.4 0 0 0 11.5 13 5.2 5.2 0 0 0 9.5 23.6Z"
     fill="#94a8be"
   />
-`, ft = (s = 3, t = 28.5) => s === 2 ? w`
-      <g fill="#4cc9f0">
+`, kt = (s = 3, t = 28.5) => s === 2 ? w`
+      <g style="fill: var(--wg-rain, #4cc9f0)">
         <circle cx="18.5" cy=${t + 1.5} r="1.45" />
         <circle cx="24.5" cy=${t + 3.2} r="1.45" />
       </g>
     ` : s === 4 ? w`
-      <g stroke="#4cc9f0" stroke-width="2.1" stroke-linecap="round">
+      <g style="stroke: var(--wg-rain, #4cc9f0)" stroke-width="2.1" stroke-linecap="round">
         <line x1="14.5" y1=${t} x2="12.8" y2=${t + 5} />
         <line x1="19.5" y1=${t + 0.8} x2="17.8" y2=${t + 5.8} />
         <line x1="24.5" y1=${t} x2="22.8" y2=${t + 5} />
         <line x1="29.2" y1=${t + 0.8} x2="27.5" y2=${t + 5.8} />
       </g>
     ` : w`
-    <g fill="#4cc9f0">
+    <g style="fill: var(--wg-rain, #4cc9f0)">
       <circle cx="16.5" cy=${t + 1.2} r="1.4" />
       <circle cx="21.5" cy=${t + 3.6} r="1.4" />
       <circle cx="26.2" cy=${t + 1.4} r="1.4" />
     </g>
-  `, Bt = () => w`
+  `, ie = () => w`
   <polygon
     points="22.8,22.2 18.2,29.2 21.8,29.2 19.9,35.6 27.4,27.3 23.4,27.3"
     fill="#38bdf8"
-    stroke="#0d1e33"
+    style="stroke: var(--wg-bg, #0d1e33)"
     stroke-width="0.6"
     stroke-linejoin="round"
   />
 `;
-function te(s) {
+function we(s) {
   switch (s) {
     case "sunny":
-      return Z(20, 20, 8.2);
+      return Q(20, 20, 8.2);
     case "clear-night":
       return w`
         <path
@@ -696,80 +749,80 @@ function te(s) {
     case "mostly-sunny":
       return w`
         <g>
-          ${Z(15.5, 15.5, 6.8)}
-          ${k(2, 2)}
+          ${Q(15.5, 15.5, 6.8)}
+          ${C(2, 2)}
         </g>
       `;
     case "partly-cloudy-day":
       return w`
         <g>
-          ${Z(15, 15, 6.5)}
-          ${L(5, 1)}
-          ${k(1, 2.5)}
+          ${Q(15, 15, 6.5)}
+          ${V(5, 1)}
+          ${C(1, 2.5)}
         </g>
       `;
     case "partly-cloudy-night":
       return w`
         <g>
-          ${gt(-1, 0)}
-          ${L(5, 2)}
-          ${k(1, 3)}
+          ${vt(-1, 0)}
+          ${V(5, 2)}
+          ${C(1, 3)}
         </g>
       `;
     case "cloudy":
       return w`
         <g>
-          ${L(0, -1)}
-          ${k(1, 3)}
+          ${V(0, -1)}
+          ${C(1, 3)}
         </g>
       `;
     case "light-shower-day":
       return w`
         <g>
-          ${Z(14.5, 13.5, 5.8)}
-          ${k(0, 0)}
-          ${ft(3, 28)}
+          ${Q(14.5, 13.5, 5.8)}
+          ${C(0, 0)}
+          ${kt(3, 28)}
         </g>
       `;
     case "light-shower-night":
       return w`
         <g>
-          ${gt(-2, -2)}
-          ${L(4, -1)}
-          ${k(0, 0.5)}
-          ${ft(3, 28.5)}
+          ${vt(-2, -2)}
+          ${V(4, -1)}
+          ${C(0, 0.5)}
+          ${kt(3, 28.5)}
         </g>
       `;
     case "rain":
     case "heavy-rain":
       return w`
         <g>
-          ${L(0, -2.5)}
-          ${k(1, 0)}
-          ${ft(4, 28.2)}
+          ${V(0, -2.5)}
+          ${C(1, 0)}
+          ${kt(4, 28.2)}
         </g>
       `;
     case "storm-day":
       return w`
         <g>
-          ${Z(14.5, 13.8, 6.1)}
-          ${k(0.5, 0.5)}
-          ${Bt()}
+          ${Q(14.5, 13.8, 6.1)}
+          ${C(0.5, 0.5)}
+          ${ie()}
         </g>
       `;
     case "storm-night":
       return w`
         <g>
-          ${gt(-2, -2)}
-          ${L(3, -1.5)}
-          ${k(0.5, 0.5)}
-          ${Bt()}
+          ${vt(-2, -2)}
+          ${V(3, -1.5)}
+          ${C(0.5, 0.5)}
+          ${ie()}
         </g>
       `;
     case "fog":
       return w`
         <g>
-          ${k(-1, -2)}
+          ${C(-1, -2)}
           <g stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round">
             <line x1="10" y1="28.5" x2="30" y2="28.5" />
             <line x1="12.5" y1="33" x2="27.5" y2="33" />
@@ -787,7 +840,7 @@ function te(s) {
     case "snow":
       return w`
         <g>
-          ${k(0, -1)}
+          ${C(0, -1)}
           <g fill="#bae6fd">
             <circle cx="16" cy="30.5" r="1.8" />
             <circle cx="22" cy="33" r="1.8" />
@@ -805,8 +858,8 @@ function te(s) {
       `;
   }
 }
-function ke(s, t = 36) {
-  return A`
+function Ve(s, t = 36) {
+  return $`
     <svg
       width=${t}
       height=${t}
@@ -815,11 +868,11 @@ function ke(s, t = 36) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      ${te(s)}
+      ${we(s)}
     </svg>
   `;
 }
-function Ee(s, t, e, i = 32) {
+function Ze(s, t, e, i = 32) {
   return w`
     <svg
       x=${t}
@@ -830,12 +883,12 @@ function Ee(s, t, e, i = 32) {
       fill="none"
       aria-hidden="true"
     >
-      ${te(s)}
+      ${we(s)}
     </svg>
   `;
 }
-function Me(s = 18) {
-  return A`
+function Ge(s = 18) {
+  return $`
     <svg
       width=${s}
       height=${s}
@@ -846,13 +899,13 @@ function Me(s = 18) {
     >
       <path
         d="M10 2.2C10 2.2 3.2 10.4 3.2 15.1A6.8 6.8 0 0 0 16.8 15.1C16.8 10.4 10 2.2 10 2.2Z"
-        fill="#4cc9f0"
+        style="fill: var(--wg-rain, #4cc9f0)"
       />
     </svg>
   `;
 }
-function Ce(s = 16) {
-  return A`
+function Ke(s = 16) {
+  return $`
     <svg
       width=${s}
       height=${s}
@@ -868,7 +921,7 @@ function Ce(s = 16) {
     </svg>
   `;
 }
-const Ne = [
+const qe = [
   "N",
   "NNE",
   "NE",
@@ -885,7 +938,7 @@ const Ne = [
   "WNW",
   "NW",
   "NNW"
-], Ft = {
+], se = {
   N: 0,
   NNE: 22.5,
   NE: 45,
@@ -903,13 +956,13 @@ const Ne = [
   NW: 315,
   NNW: 337.5
 };
-function ee(s, t) {
+function _e(s, t) {
   if (s == null || t === null || t === void 0 || !Number.isFinite(s) || !Number.isFinite(t) || t <= 0)
     return null;
   const e = Math.max(1, Math.min(100, t)), i = 17.27, n = 237.7, r = i * s / (n + s) + Math.log(e / 100), o = i - r;
   return Math.abs(o) < 1e-9 ? null : Math.round(n * r / o * 10) / 10;
 }
-function kt(s) {
+function Wt(s) {
   if (s == null)
     return { cardinal: null, degrees: null };
   if (typeof s == "number") {
@@ -917,7 +970,7 @@ function kt(s) {
       return { cardinal: null, degrees: null };
     const t = (s % 360 + 360) % 360, e = Math.floor((t + 11.25) / 22.5) % 16;
     return {
-      cardinal: Ne[e],
+      cardinal: qe[e],
       degrees: Math.round(t * 10) / 10
     };
   }
@@ -925,33 +978,33 @@ function kt(s) {
     const t = s.trim().toUpperCase();
     if (!t || t === "CALM" || t === "UNAVAILABLE" || t === "UNKNOWN")
       return { cardinal: null, degrees: null };
-    if (t in Ft)
-      return { cardinal: t, degrees: Ft[t] };
+    if (t in se)
+      return { cardinal: t, degrees: se[t] };
     const e = Number(t);
     if (Number.isFinite(e))
-      return kt(e);
+      return Wt(e);
   }
   return { cardinal: null, degrees: null };
 }
-function Pe(s) {
+function Ye(s) {
   return s == null || !Number.isFinite(s) ? 0 : ((s + 180) % 360 + 360) % 360;
 }
-function Ie(s, t) {
+function Je(s, t) {
   if (!s || typeof s != "string")
     return null;
   const e = s.trim();
   if (/(?:Z|[+-]\d{2}:?\d{2})$/i.test(e)) {
-    const c = Date.parse(e);
-    return Number.isFinite(c) ? c : null;
+    const h = Date.parse(e);
+    return Number.isFinite(h) ? h : null;
   }
   const n = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/.exec(e);
   if (!n) {
-    const c = Date.parse(e);
-    return Number.isFinite(c) ? c : null;
+    const h = Date.parse(e);
+    return Number.isFinite(h) ? h : null;
   }
-  const r = Number(n[1]), o = Number(n[2]), a = Number(n[3]), l = Number(n[4]), h = Number(n[5]), u = Number(n[6] ?? "0");
+  const r = Number(n[1]), o = Number(n[2]), a = Number(n[3]), c = Number(n[4]), l = Number(n[5]), d = Number(n[6] ?? "0");
   try {
-    const c = Date.UTC(r, o - 1, a, l, h, u), _ = new Intl.DateTimeFormat("en-US", {
+    const h = Date.UTC(r, o - 1, a, c, l, d), _ = new Intl.DateTimeFormat("en-US", {
       timeZone: t,
       year: "numeric",
       month: "2-digit",
@@ -960,23 +1013,23 @@ function Ie(s, t) {
       minute: "2-digit",
       second: "2-digit",
       hourCycle: "h23"
-    }).formatToParts(new Date(c)), p = {};
+    }).formatToParts(new Date(h)), u = {};
     for (const S of _)
-      S.type !== "literal" && (p[S.type] = Number(S.value));
-    const v = Date.UTC(
-      p.year,
-      (p.month ?? 1) - 1,
-      p.day ?? 1,
-      p.hour ?? 0,
-      p.minute ?? 0,
-      p.second ?? 0
-    ) - c;
-    return c - v;
+      S.type !== "literal" && (u[S.type] = Number(S.value));
+    const k = Date.UTC(
+      u.year,
+      (u.month ?? 1) - 1,
+      u.day ?? 1,
+      u.hour ?? 0,
+      u.minute ?? 0,
+      u.second ?? 0
+    ) - h;
+    return h - k;
   } catch {
-    return new Date(r, o - 1, a, l, h, u).getTime();
+    return new Date(r, o - 1, a, c, l, d).getTime();
   }
 }
-function rt(s, t) {
+function ut(s, t) {
   try {
     const i = new Intl.DateTimeFormat("en-US", {
       timeZone: t || void 0,
@@ -988,7 +1041,7 @@ function rt(s, t) {
     return new Date(s).getHours();
   }
 }
-function Te(s, t) {
+function Qe(s, t) {
   var e, i, n;
   try {
     const r = {
@@ -998,18 +1051,18 @@ function Te(s, t) {
       ...t ? { timeZone: t } : {}
     }, o = new Intl.DateTimeFormat("en-US", r).formatToParts(
       new Date(s)
-    ), a = (((e = o.find((u) => u.type === "weekday")) == null ? void 0 : e.value) ?? "").toUpperCase(), l = ((i = o.find((u) => u.type === "hour")) == null ? void 0 : i.value) ?? "", h = (((n = o.find((u) => u.type === "dayPeriod")) == null ? void 0 : n.value) ?? "").toUpperCase();
-    return `${a} ${l}${h}`.trim();
+    ), a = (((e = o.find((d) => d.type === "weekday")) == null ? void 0 : e.value) ?? "").toUpperCase(), c = ((i = o.find((d) => d.type === "hour")) == null ? void 0 : i.value) ?? "", l = (((n = o.find((d) => d.type === "dayPeriod")) == null ? void 0 : n.value) ?? "").toUpperCase();
+    return `${a} ${c}${l}`.trim();
   } catch {
-    const r = new Date(s), o = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"], a = r.getHours(), l = a >= 12 ? "PM" : "AM", h = a % 12 || 12;
-    return `${o[r.getDay()]} ${h}${l}`;
+    const r = new Date(s), o = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"], a = r.getHours(), c = a >= 12 ? "PM" : "AM", l = a % 12 || 12;
+    return `${o[r.getDay()]} ${l}${c}`;
   }
 }
-function He(s, t) {
-  const e = rt(s, t), i = e >= 12 ? "pm" : "am";
+function ti(s, t) {
+  const e = ut(s, t), i = e >= 12 ? "pm" : "am";
   return `${e % 12 || 12}${i}`;
 }
-function Re(s, t) {
+function ei(s, t) {
   try {
     return new Intl.DateTimeFormat("en-US", {
       weekday: "short",
@@ -1019,28 +1072,28 @@ function Re(s, t) {
     return ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][new Date(s).getDay()];
   }
 }
-function De(s) {
-  const e = s.map((c) => c.temperature).filter((c) => c !== null && Number.isFinite(c));
+function ii(s) {
+  const e = s.map((h) => h.temperature).filter((h) => h !== null && Number.isFinite(h));
   let i = 5, n = 10;
   if (e.length > 0) {
-    const c = Math.min(...e), f = Math.max(...e);
-    f - c > 18 ? i = 10 : i = 5;
-    const p = i * 4, y = (c + f) / 2;
-    n = Math.round((y - p / 2) / i) * i, c <= n + 0.5 && (n = Math.floor((c - 1) / i) * i), f >= n + p - 0.5 && (f - n > p ? (i = Math.ceil((f - c + 4) / 4 / 5) * 5, n = Math.floor((c - 1) / 5) * 5) : n = Math.ceil((f + 1 - p) / i) * i);
+    const h = Math.min(...e), g = Math.max(...e);
+    g - h > 18 ? i = 10 : i = 5;
+    const u = i * 4, y = (h + g) / 2;
+    n = Math.round((y - u / 2) / i) * i, h <= n + 0.5 && (n = Math.floor((h - 1) / i) * i), g >= n + u - 0.5 && (g - n > u ? (i = Math.ceil((g - h + 4) / 4 / 5) * 5, n = Math.floor((h - 1) / 5) * 5) : n = Math.ceil((g + 1 - u) / i) * i);
   }
   const r = Array.from(
     { length: 5 },
-    (c, f) => n + f * i
-  ), o = s.map((c) => c.wind_speed_kmh).filter((c) => Number.isFinite(c)), a = o.length > 0 ? Math.max(...o) : 25, l = [10, 15, 20, 25, 30];
-  let h = 10;
-  for (const c of l) {
-    if (c * 4 >= Math.max(32, a * 1.12)) {
-      h = c;
+    (h, g) => n + g * i
+  ), o = s.map((h) => h.wind_speed_kmh).filter((h) => Number.isFinite(h)), a = o.length > 0 ? Math.max(...o) : 25, c = [10, 15, 20, 25, 30];
+  let l = 10;
+  for (const h of c) {
+    if (h * 4 >= Math.max(32, a * 1.12)) {
+      l = h;
       break;
     }
-    h = c;
+    l = h;
   }
-  const u = Array.from({ length: 5 }, (c, f) => f * h);
+  const d = Array.from({ length: 5 }, (h, g) => g * l);
   return {
     temp: {
       min: r[0],
@@ -1050,14 +1103,14 @@ function De(s) {
     },
     wind: {
       min: 0,
-      max: u[4],
-      step: h,
-      ticks: u
+      max: d[4],
+      step: l,
+      ticks: d
     },
     gridCount: 5
   };
 }
-function Xt(s, t) {
+function ne(s, t) {
   var r;
   if (!(s != null && s.states))
     return t || null;
@@ -1065,9 +1118,9 @@ function Xt(s, t) {
     const o = s.states[t], a = Number(((r = o == null ? void 0 : o.attributes) == null ? void 0 : r.supported_features) ?? 0);
     if (o && (a & 2) !== 0)
       return t;
-    const l = t.endsWith("_hourly") ? t : `${t}_hourly`;
-    if (s.states[l])
-      return l;
+    const c = t.endsWith("_hourly") ? t : `${t}_hourly`;
+    if (s.states[c])
+      return c;
     if (o)
       return t;
   }
@@ -1077,75 +1130,75 @@ function Xt(s, t) {
   if (i)
     return i;
   const n = e.find((o) => {
-    var l, h;
-    return (Number(((h = (l = s.states[o]) == null ? void 0 : l.attributes) == null ? void 0 : h.supported_features) ?? 0) & 2) !== 0;
+    var c, l;
+    return (Number(((l = (c = s.states[o]) == null ? void 0 : c.attributes) == null ? void 0 : l.supported_features) ?? 0) & 2) !== 0;
   });
   return n || (e[0] ?? null);
 }
-function N(s) {
+function I(s) {
   if (s == null || typeof s == "boolean")
     return null;
   const t = Number(s);
   return Number.isFinite(t) ? t : null;
 }
-function mt(s, t) {
+function St(s, t) {
   return s === null ? null : t.toUpperCase().includes("F") ? Math.round((s - 32) * 5 / 9 * 10) / 10 : Math.round(s * 10) / 10;
 }
-function jt(s, t) {
+function re(s, t) {
   if (s === null) return null;
   const e = (t ?? "km/h").trim().toLowerCase();
   return e === "mph" || e === "mi/h" ? Math.round(s * 1.60934 * 10) / 10 : e === "m/s" || e === "mps" ? Math.round(s * 3.6 * 10) / 10 : e === "kn" || e === "kt" || e === "knots" ? Math.round(s * 1.852 * 10) / 10 : Math.round(s * 10) / 10;
 }
-function Ue(s, t, e, i = 48) {
-  var _, p, y, v, S;
-  const n = t.states[e], r = (n == null ? void 0 : n.attributes) ?? {}, o = ((_ = t.config) == null ? void 0 : _.time_zone) || "UTC", a = r.temperature_unit || ((y = (p = t.config) == null ? void 0 : p.unit_system) == null ? void 0 : y.temperature) || "°C", l = r.wind_speed_unit || ((S = (v = t.config) == null ? void 0 : v.unit_system) == null ? void 0 : S.wind_speed) || "km/h", h = t.states["sun.sun"], u = [];
-  if (h != null && h.attributes) {
-    const m = h.attributes.next_rising, M = h.attributes.next_setting, d = m ? Date.parse(m) : NaN, g = M ? Date.parse(M) : NaN;
-    (Number.isFinite(d) || Number.isFinite(g)) && u.push({
-      sunrise: Number.isFinite(d) ? new Date(d).toISOString() : null,
-      sunrise_ms: Number.isFinite(d) ? d : null,
-      sunset: Number.isFinite(g) ? new Date(g).toISOString() : null,
-      sunset_ms: Number.isFinite(g) ? g : null
+function si(s, t, e, i = 48) {
+  var _, u, y, k, S;
+  const n = t.states[e], r = (n == null ? void 0 : n.attributes) ?? {}, o = ((_ = t.config) == null ? void 0 : _.time_zone) || "UTC", a = r.temperature_unit || ((y = (u = t.config) == null ? void 0 : u.unit_system) == null ? void 0 : y.temperature) || "°C", c = r.wind_speed_unit || ((S = (k = t.config) == null ? void 0 : k.unit_system) == null ? void 0 : S.wind_speed) || "km/h", l = t.states["sun.sun"], d = [];
+  if (l != null && l.attributes) {
+    const m = l.attributes.next_rising, P = l.attributes.next_setting, E = m ? Date.parse(m) : NaN, N = P ? Date.parse(P) : NaN;
+    (Number.isFinite(E) || Number.isFinite(N)) && d.push({
+      sunrise: Number.isFinite(E) ? new Date(E).toISOString() : null,
+      sunrise_ms: Number.isFinite(E) ? E : null,
+      sunset: Number.isFinite(N) ? new Date(N).toISOString() : null,
+      sunset_ms: Number.isFinite(N) ? N : null
     });
   }
-  const c = Math.max(1, Math.min(72, i)), f = [];
+  const h = Math.max(1, Math.min(72, i)), g = [];
   for (const m of s) {
-    const M = String(m.datetime ?? ""), d = Ie(M, o);
-    if (d === null) continue;
-    const g = mt(
-      N(m.temperature ?? m.native_temperature),
+    const P = String(m.datetime ?? ""), E = Je(P, o);
+    if (E === null) continue;
+    const N = St(
+      I(m.temperature ?? m.native_temperature),
       a
-    ), b = mt(
-      N(m.apparent_temperature ?? m.native_apparent_temperature),
+    ), _t = St(
+      I(m.apparent_temperature ?? m.native_apparent_temperature),
       a
-    ), C = N(m.humidity), Et = mt(
-      N(m.dew_point ?? m.native_dew_point),
+    ), W = I(m.humidity), p = St(
+      I(m.dew_point ?? m.native_dew_point),
       a
-    ) ?? ee(g, C), et = N(m.precipitation_probability) ?? 0, ie = N(m.precipitation ?? m.native_precipitation), se = jt(N(m.wind_speed ?? m.native_wind_speed), l) ?? 0, ne = jt(
-      N(m.wind_gust_speed ?? m.native_wind_gust_speed),
-      l
-    ), { cardinal: re, degrees: oe } = kt(
+    ) ?? _e(N, W), f = I(m.precipitation_probability) ?? 0, v = I(m.precipitation ?? m.native_precipitation), j = re(I(m.wind_speed ?? m.native_wind_speed), c) ?? 0, Y = re(
+      I(m.wind_gust_speed ?? m.native_wind_gust_speed),
+      c
+    ), { cardinal: Ft, degrees: lt } = Wt(
       m.wind_bearing
-    ), Mt = String(m.condition ?? "partlycloudy"), Ct = rt(d, o), ae = !!m.is_night || Mt === "clear-night" || Ct < 6 || Ct >= 19;
-    if (f.push({
-      datetime: M,
-      epoch_ms: d,
-      temperature: g,
-      feels_like: b,
-      humidity: C,
-      dew_point: Et,
-      rain_chance: Math.max(0, Math.min(100, et)),
+    ), Bt = String(m.condition ?? "partlycloudy"), Xt = ut(E, o), be = !!m.is_night || Bt === "clear-night" || Xt < 6 || Xt >= 19;
+    if (g.push({
+      datetime: P,
+      epoch_ms: E,
+      temperature: N,
+      feels_like: _t,
+      humidity: W,
+      dew_point: p,
+      rain_chance: Math.max(0, Math.min(100, f)),
       rain_min_mm: null,
-      rain_max_mm: ie,
-      wind_speed_kmh: Math.max(0, se),
-      wind_gust_kmh: ne,
-      wind_direction: re,
-      wind_bearing_deg: oe,
+      rain_max_mm: v,
+      wind_speed_kmh: Math.max(0, j),
+      wind_gust_kmh: Y,
+      wind_direction: Ft,
+      wind_bearing_deg: lt,
       icon_descriptor: m.icon_descriptor ?? null,
-      condition: Mt,
-      is_night: ae,
-      uv_index: N(m.uv_index)
-    }), f.length >= c) break;
+      condition: Bt,
+      is_night: be,
+      uv_index: I(m.uv_index)
+    }), g.length >= h) break;
   }
   return {
     source: "homeassistant_weather",
@@ -1161,16 +1214,16 @@ function Ue(s, t, e, i = 48) {
       precipitation: "mm"
     },
     current: null,
-    sun_windows: u,
-    hourly: f
+    sun_windows: d,
+    hourly: g
   };
 }
-function st(s) {
+function ht(s) {
   if (s.length === 0) return "";
   if (s.length === 1)
-    return `M ${$(s[0].x)} ${$(s[0].y)}`;
+    return `M ${x(s[0].x)} ${x(s[0].y)}`;
   if (s.length === 2)
-    return `M ${$(s[0].x)} ${$(s[0].y)} L ${$(s[1].x)} ${$(s[1].y)}`;
+    return `M ${x(s[0].x)} ${x(s[0].y)} L ${x(s[1].x)} ${x(s[1].y)}`;
   const t = s.length, e = new Array(t - 1), i = new Array(t - 1), n = new Array(t - 1);
   for (let a = 0; a < t - 1; a++)
     e[a] = s[a + 1].x - s[a].x, i[a] = s[a + 1].y - s[a].y, n[a] = e[a] !== 0 ? i[a] / e[a] : 0;
@@ -1180,70 +1233,70 @@ function st(s) {
     if (n[a - 1] * n[a] <= 0)
       r[a] = 0;
     else {
-      const l = 2 * e[a] + e[a - 1], h = e[a] + 2 * e[a - 1];
-      r[a] = (l + h) / (l / n[a - 1] + h / n[a]);
+      const c = 2 * e[a] + e[a - 1], l = e[a] + 2 * e[a - 1];
+      r[a] = (c + l) / (c / n[a - 1] + l / n[a]);
     }
   for (let a = 0; a < t - 1; a++)
     if (Math.abs(n[a]) < 1e-9)
       r[a] = 0, r[a + 1] = 0;
     else {
-      const l = r[a] / n[a], h = r[a + 1] / n[a], u = Math.hypot(l, h);
-      if (u > 3) {
-        const c = 3 / u;
-        r[a] = c * l * n[a], r[a + 1] = c * h * n[a];
+      const c = r[a] / n[a], l = r[a + 1] / n[a], d = Math.hypot(c, l);
+      if (d > 3) {
+        const h = 3 / d;
+        r[a] = h * c * n[a], r[a + 1] = h * l * n[a];
       }
     }
-  let o = `M ${$(s[0].x)} ${$(s[0].y)}`;
+  let o = `M ${x(s[0].x)} ${x(s[0].y)}`;
   for (let a = 0; a < t - 1; a++) {
-    const l = s[a], h = s[a + 1], u = e[a], c = l.x + u / 3, f = l.y + r[a] * u / 3, _ = h.x - u / 3, p = h.y - r[a + 1] * u / 3;
-    o += ` C ${$(c)} ${$(f)}, ${$(_)} ${$(p)}, ${$(h.x)} ${$(h.y)}`;
+    const c = s[a], l = s[a + 1], d = e[a], h = c.x + d / 3, g = c.y + r[a] * d / 3, _ = l.x - d / 3, u = l.y - r[a + 1] * d / 3;
+    o += ` C ${x(h)} ${x(g)}, ${x(_)} ${x(u)}, ${x(l.x)} ${x(l.y)}`;
   }
   return o;
 }
-function We(s, t) {
+function ni(s, t) {
   if (s.length === 0) return "";
   if (s.length === 1) {
     const r = s[0];
-    return `M ${$(r.x)} ${$(t)} L ${$(r.x)} ${$(r.y)} L ${$(r.x)} ${$(t)} Z`;
+    return `M ${x(r.x)} ${x(t)} L ${x(r.x)} ${x(r.y)} L ${x(r.x)} ${x(t)} Z`;
   }
-  const e = st(s), i = s[0], n = s[s.length - 1];
-  return `${e} L ${$(n.x)} ${$(t)} L ${$(i.x)} ${$(t)} Z`;
+  const e = ht(s), i = s[0], n = s[s.length - 1];
+  return `${e} L ${x(n.x)} ${x(t)} L ${x(i.x)} ${x(t)} Z`;
 }
-function Le(s, t, e, i) {
+function ri(s, t, e, i) {
   if (s.length === 0 || i <= 0)
     return [];
   if (s.length === 1)
     return [{ startX: 0, endX: i, isNight: s[0].is_night }];
-  const n = s[0].epoch_ms, r = s[s.length - 1].epoch_ms, o = e(0), a = e(s.length - 1), l = r - n, h = (p) => {
-    if (l <= 0) return o;
-    const y = (p - n) / l;
+  const n = s[0].epoch_ms, r = s[s.length - 1].epoch_ms, o = e(0), a = e(s.length - 1), c = r - n, l = (u) => {
+    if (c <= 0) return o;
+    const y = (u - n) / c;
     return Math.max(0, Math.min(i, o + y * (a - o)));
-  }, u = [];
-  for (const p of t)
-    p.sunrise_ms !== null && p.sunrise_ms > n && p.sunrise_ms < r && u.push({ x: h(p.sunrise_ms), toNight: !1 }), p.sunset_ms !== null && p.sunset_ms > n && p.sunset_ms < r && u.push({ x: h(p.sunset_ms), toNight: !0 });
-  if (u.length > 0) {
-    u.sort((S, m) => S.x - m.x);
-    const p = [];
-    let y = 0, v = !u[0].toNight;
-    for (const S of u) {
+  }, d = [];
+  for (const u of t)
+    u.sunrise_ms !== null && u.sunrise_ms > n && u.sunrise_ms < r && d.push({ x: l(u.sunrise_ms), toNight: !1 }), u.sunset_ms !== null && u.sunset_ms > n && u.sunset_ms < r && d.push({ x: l(u.sunset_ms), toNight: !0 });
+  if (d.length > 0) {
+    d.sort((S, m) => S.x - m.x);
+    const u = [];
+    let y = 0, k = !d[0].toNight;
+    for (const S of d) {
       const m = Math.max(y, Math.min(i, S.x));
-      m > y && p.push({ startX: y, endX: m, isNight: v }), y = m, v = S.toNight;
+      m > y && u.push({ startX: y, endX: m, isNight: k }), y = m, k = S.toNight;
     }
-    return y < i && p.push({ startX: y, endX: i, isNight: v }), p;
+    return y < i && u.push({ startX: y, endX: i, isNight: k }), u;
   }
-  const c = [];
-  let f = 0, _ = s[0].is_night;
-  for (let p = 1; p < s.length; p++)
-    if (s[p].is_night !== _) {
-      const y = (e(p - 1) + e(p)) / 2;
-      c.push({ startX: f, endX: y, isNight: _ }), f = y, _ = s[p].is_night;
+  const h = [];
+  let g = 0, _ = s[0].is_night;
+  for (let u = 1; u < s.length; u++)
+    if (s[u].is_night !== _) {
+      const y = (e(u - 1) + e(u)) / 2;
+      h.push({ startX: g, endX: y, isNight: _ }), g = y, _ = s[u].is_night;
     }
-  return c.push({ startX: f, endX: i, isNight: _ }), c;
+  return h.push({ startX: g, endX: i, isNight: _ }), h;
 }
-function $(s) {
+function x(s) {
   return (Math.round(s * 100) / 100).toString();
 }
-const E = 76, ze = 112, z = 272, P = 288, V = 44, O = 44, _t = 14, ot = class ot extends U {
+const T = 76, oi = 112, Z = 272, H = 288, tt = 44, et = 44, At = 14, gt = class gt extends F {
   constructor() {
     super(), this._isScrubbing = !1, this._activePointerId = null, this.hours = [], this.sunWindows = [], this.timeZone = "Australia/Sydney", this.selectedIndex = 0, this.visibleHours = 24, this.showTemperature = !0, this.showRain = !0, this.showWind = !0, this._viewportWidth = 460, this._canScrollLeft = !1, this._canScrollRight = !1;
   }
@@ -1273,14 +1326,14 @@ const E = 76, ze = 112, z = 272, P = 288, V = 44, O = 44, _t = 14, ot = class ot
   _getGeometry() {
     const t = Math.max(1, this.hours.length), e = Math.max(8, Math.min(t, this.visibleHours || 24)), n = Math.max(
       180,
-      this._viewportWidth - V - O - _t * 2
-    ) / Math.max(1, e - 1), r = V + _t, o = Math.max(
+      this._viewportWidth - tt - et - At * 2
+    ) / Math.max(1, e - 1), r = tt + At, o = Math.max(
       this._viewportWidth,
       Math.ceil(
-        r + (t - 1) * n + O + _t
+        r + (t - 1) * n + et + At
       )
     );
-    return { count: t, hourSpacing: n, firstX: r, totalWidth: o, xForIndex: (l) => r + l * n };
+    return { count: t, hourSpacing: n, firstX: r, totalWidth: o, xForIndex: (c) => r + c * n };
   }
   _emitSelectedIndex(t) {
     if (this.hours.length === 0) return;
@@ -1341,9 +1394,9 @@ const E = 76, ze = 112, z = 272, P = 288, V = 44, O = 44, _t = 14, ot = class ot
   _scrollIndexIntoView(t) {
     const e = this._scrollEl;
     if (!e) return;
-    const { xForIndex: i } = this._getGeometry(), n = i(t), r = e.scrollLeft + V + 16, o = e.scrollLeft + e.clientWidth - O - 16;
-    n < r ? e.scrollTo({ left: Math.max(0, n - V - 24), behavior: "smooth" }) : n > o && e.scrollTo({
-      left: n - e.clientWidth + O + 24,
+    const { xForIndex: i } = this._getGeometry(), n = i(t), r = e.scrollLeft + tt + 16, o = e.scrollLeft + e.clientWidth - et - 16;
+    n < r ? e.scrollTo({ left: Math.max(0, n - tt - 24), behavior: "smooth" }) : n > o && e.scrollTo({
+      left: n - e.clientWidth + et + 24,
       behavior: "smooth"
     });
   }
@@ -1362,43 +1415,51 @@ const E = 76, ze = 112, z = 272, P = 288, V = 44, O = 44, _t = 14, ot = class ot
   }
   render() {
     if (this.hours.length === 0)
-      return x;
-    const { totalWidth: t, xForIndex: e } = this._getGeometry(), i = De(this.hours), n = z - ze, r = (d) => {
-      const g = i.temp.max - i.temp.min || 1, b = (d - i.temp.min) / g;
-      return z - b * n;
-    }, o = (d) => {
-      const g = Math.max(0, Math.min(100, d));
-      return z - g / 100 * n;
-    }, a = (d) => {
-      const g = i.wind.max || 40, b = Math.max(0, d);
-      return z - Math.min(1.06, b / g) * n;
-    }, l = Le(
+      return b;
+    const { totalWidth: t, xForIndex: e } = this._getGeometry(), i = ii(this.hours), n = Z - oi, r = (p) => {
+      const f = i.temp.max - i.temp.min || 1, v = (p - i.temp.min) / f;
+      return Z - v * n;
+    }, o = (p) => {
+      const f = Math.max(0, Math.min(100, p));
+      return Z - f / 100 * n;
+    }, a = (p) => {
+      const f = i.wind.max || 40, v = Math.max(0, p);
+      return Z - Math.min(1.06, v / f) * n;
+    }, c = ri(
       this.hours,
       this.sunWindows,
       e,
       t
-    ), h = this.hours.map((d, g) => ({
-      x: e(g),
-      y: o(d.rain_chance)
-    })), u = this.hours.map(
-      (d, g) => d.temperature !== null ? { x: e(g), y: r(d.temperature) } : null
-    ).filter((d) => d !== null), c = this.hours.map((d, g) => ({
-      x: e(g),
-      y: a(d.wind_speed_kmh)
-    })), f = We(h, z), _ = st(h), p = st(u), y = st(c), v = [];
-    for (let d = 0; d < this.hours.length; d++)
-      rt(this.hours[d].epoch_ms, this.timeZone) % 3 === 0 && v.push(d);
-    if (v.length === 0)
-      for (let d = 0; d < this.hours.length; d += 3)
-        v.push(d);
+    ), l = this.hours.map((p, f) => ({
+      x: e(f),
+      y: o(p.rain_chance)
+    })), d = this.hours.map(
+      (p, f) => p.temperature !== null ? { x: e(f), y: r(p.temperature) } : null
+    ).filter((p) => p !== null), h = this.hours.map((p, f) => ({
+      x: e(f),
+      y: a(p.wind_speed_kmh)
+    })), g = ni(l, Z), _ = ht(l), u = ht(d), y = ht(h), k = [];
+    for (let p = 0; p < this.hours.length; p++)
+      ut(this.hours[p].epoch_ms, this.timeZone) % 3 === 0 && k.push(p);
+    if (k.length === 0)
+      for (let p = 0; p < this.hours.length; p += 3)
+        k.push(p);
     const S = Math.max(
       0,
       Math.min(this.hours.length - 1, this.selectedIndex)
-    ), m = e(S), M = Array.from({ length: i.gridCount }, (d, g) => {
-      const b = g / (i.gridCount - 1);
-      return z - b * n;
-    });
-    return A`
+    ), m = e(S), P = Array.from({ length: i.gridCount }, (p, f) => {
+      const v = f / (i.gridCount - 1);
+      return Z - v * n;
+    }), E = {
+      unit: "%",
+      ticks: Array.from(
+        { length: i.gridCount },
+        (p, f) => Math.round(f * 100 / (i.gridCount - 1))
+      ),
+      tone: "rain",
+      dim: !1
+    }, N = this.showRain && !this.showTemperature, _t = this.showRain && this.showTemperature && !this.showWind, W = N ? E : { unit: "°C", ticks: i.temp.ticks, tone: "temp", dim: !this.showTemperature }, q = _t ? E : { unit: "km/h", ticks: i.wind.ticks, tone: "wind", dim: !this.showWind };
+    return $`
       <div
         class="wg-chart-shell"
         tabindex="0"
@@ -1409,7 +1470,7 @@ const E = 76, ze = 112, z = 272, P = 288, V = 44, O = 44, _t = 14, ot = class ot
         aria-valuenow=${S}
         @keydown=${this._onKeyDown}
       >
-        ${this._canScrollLeft ? A`
+        ${this._canScrollLeft ? $`
               <button
                 class="wg-pan-btn wg-pan-left"
                 type="button"
@@ -1418,8 +1479,8 @@ const E = 76, ze = 112, z = 272, P = 288, V = 44, O = 44, _t = 14, ot = class ot
               >
                 &#8249;
               </button>
-            ` : x}
-        ${this._canScrollRight ? A`
+            ` : b}
+        ${this._canScrollRight ? $`
               <button
                 class="wg-pan-btn wg-pan-right"
                 type="button"
@@ -1428,31 +1489,37 @@ const E = 76, ze = 112, z = 272, P = 288, V = 44, O = 44, _t = 14, ot = class ot
               >
                 &#8250;
               </button>
-            ` : x}
+            ` : b}
 
-        <div class="wg-axis-overlay wg-axis-left" aria-hidden="true">
-          <span class="wg-axis-unit">°C</span>
-          ${i.temp.ticks.map(
-      (d, g) => A`
+        <div
+          class="wg-axis-overlay wg-axis-left wg-axis-${W.tone} ${W.dim ? "wg-axis-dim" : ""}"
+          aria-hidden="true"
+        >
+          <span class="wg-axis-unit">${W.unit}</span>
+          ${W.ticks.map(
+      (p, f) => $`
               <span
                 class="wg-axis-tick"
-                style="top: ${M[g] - E}px"
+                style="top: ${P[f] - T}px"
               >
-                ${d}
+                ${p}
               </span>
             `
     )}
         </div>
 
-        <div class="wg-axis-overlay wg-axis-right" aria-hidden="true">
-          <span class="wg-axis-unit">km/h</span>
-          ${i.wind.ticks.map(
-      (d, g) => A`
+        <div
+          class="wg-axis-overlay wg-axis-right wg-axis-${q.tone} ${q.dim ? "wg-axis-dim" : ""}"
+          aria-hidden="true"
+        >
+          <span class="wg-axis-unit">${q.unit}</span>
+          ${q.ticks.map(
+      (p, f) => $`
               <span
                 class="wg-axis-tick"
-                style="top: ${M[g] - E}px"
+                style="top: ${P[f] - T}px"
               >
-                ${d}
+                ${p}
               </span>
             `
     )}
@@ -1470,104 +1537,106 @@ const E = 76, ze = 112, z = 272, P = 288, V = 44, O = 44, _t = 14, ot = class ot
           <svg
             class="wg-chart-svg"
             width=${t}
-            height=${P}
-            viewBox="0 0 ${t} ${P}"
+            height=${H}
+            viewBox="0 0 ${t} ${H}"
             xmlns="http://www.w3.org/2000/svg"
           >
             <g class="wg-daynight-bands">
-              ${l.map((d) => {
-      const g = Math.max(0, d.endX - d.startX), b = d.isNight ? "#1b2e42" : "#2b5272", C = d.isNight ? "#132334" : "#1c364c";
+              ${c.map((p) => {
+      const f = Math.max(0, p.endX - p.startX), v = p.isNight ? "night" : "day";
       return w`
                   <g>
                     <rect
-                      x=${d.startX}
+                      x=${p.startX}
                       y="0"
-                      width=${g + 0.5}
-                      height=${E}
-                      fill=${b}
+                      width=${f + 0.5}
+                      height=${T}
+                      class="wg-band-${v}-strip"
                     />
                     <rect
-                      x=${d.startX}
-                      y=${E}
-                      width=${g + 0.5}
-                      height=${P - E}
-                      fill=${C}
+                      x=${p.startX}
+                      y=${T}
+                      width=${f + 0.5}
+                      height=${H - T}
+                      class="wg-band-${v}-plot"
                     />
                   </g>
                 `;
     })}
             </g>
 
-            <g stroke="rgba(255, 255, 255, 0.06)" stroke-width="1">
-              ${v.map((d) => {
-      const g = e(d);
+            <g class="wg-grid-vertical" stroke-width="1">
+              ${k.map((p) => {
+      const f = e(p);
       return w`
-                  <line x1=${g} y1="0" x2=${g} y2=${P} />
+                  <line x1=${f} y1="0" x2=${f} y2=${H} />
                 `;
     })}
             </g>
 
-            <g stroke="rgba(255, 255, 255, 0.075)" stroke-width="1">
-              ${M.map(
-      (d) => w`
-                  <line x1="0" y1=${d} x2=${t} y2=${d} />
+            <g class="wg-grid-horizontal" stroke-width="1">
+              ${P.map(
+      (p) => w`
+                  <line x1="0" y1=${p} x2=${t} y2=${p} />
                 `
     )}
             </g>
 
             <line
               x1="0"
-              y1=${E}
+              y1=${T}
               x2=${t}
-              y2=${E}
-              stroke="rgba(164, 194, 222, 0.34)"
+              y2=${T}
+              class="wg-strip-rule"
               stroke-width="1.2"
             />
-            <g stroke="rgba(164, 194, 222, 0.36)" stroke-width="1.2">
-              ${this.hours.map((d, g) => {
-      const b = e(g);
+            <g class="wg-strip-rule" stroke-width="1.2">
+              ${this.hours.map((p, f) => {
+      const v = e(f);
       return w`
                   <line
-                    x1=${b}
-                    y1=${E - 6}
-                    x2=${b}
-                    y2=${E}
+                    x1=${v}
+                    y1=${T - 6}
+                    x2=${v}
+                    y2=${T}
                   />
                 `;
     })}
             </g>
 
             <g class="wg-strip-markers">
-              ${v.map((d) => {
-      const g = this.hours[d], b = e(d), C = Qt(
-        g.icon_descriptor,
-        g.condition,
-        g.is_night
-      ), tt = He(g.epoch_ms, this.timeZone), et = rt(g.epoch_ms, this.timeZone) === 0 ? Re(g.epoch_ms, this.timeZone) : null;
+              ${k.map((p) => {
+      const f = this.hours[p], v = e(p), j = me(
+        f.icon_descriptor,
+        f.condition,
+        f.is_night
+      ), Y = ti(f.epoch_ms, this.timeZone), lt = ut(f.epoch_ms, this.timeZone) === 0 ? ei(f.epoch_ms, this.timeZone) : null;
       return w`
                   <g>
-                    ${Ee(C, b - 16, 6, 32)}
+                    <g class="wg-strip-icon">
+                      ${Ze(j, v - 16, 6, 32)}
+                    </g>
                     <text
-                      x=${b}
+                      x=${v}
                       y="57"
                       text-anchor="middle"
-                      fill="#e2ecf7"
+                      class="wg-hour-label"
                       font-size="13"
                       font-weight="500"
                       font-family="inherit"
                     >
-                      ${tt}
+                      ${Y}
                     </text>
-                    ${et ? w`
+                    ${lt ? w`
                           <text
-                            x=${b}
+                            x=${v}
                             y="69"
                             text-anchor="middle"
                             class="wg-day-pill"
                           >
-                            ${et}
+                            ${lt}
                           </text>
-                        ` : x}
+                        ` : b}
                   </g>
                 `;
     })}
@@ -1576,11 +1645,11 @@ const E = 76, ze = 112, z = 272, P = 288, V = 44, O = 44, _t = 14, ot = class ot
             <g
               class="wg-series-layer ${this.showRain ? "" : "wg-series-hidden"}"
             >
-              <path d=${f} fill="rgba(66, 158, 196, 0.48)" />
+              <path d=${g} class="wg-rain-area" />
               <path
                 d=${_}
                 fill="none"
-                stroke="rgba(96, 192, 232, 0.55)"
+                class="wg-rain-stroke"
                 stroke-width="1.4"
               />
             </g>
@@ -1589,9 +1658,9 @@ const E = 76, ze = 112, z = 272, P = 288, V = 44, O = 44, _t = 14, ot = class ot
               class="wg-series-layer ${this.showTemperature ? "" : "wg-series-hidden"}"
             >
               <path
-                d=${p}
+                d=${u}
                 fill="none"
-                stroke="#f5be36"
+                class="wg-temp-line"
                 stroke-width="3.6"
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -1604,27 +1673,28 @@ const E = 76, ze = 112, z = 272, P = 288, V = 44, O = 44, _t = 14, ot = class ot
               <path
                 d=${y}
                 fill="none"
-                stroke="rgba(226, 236, 248, 0.25)"
+                class="wg-wind-line"
                 stroke-width="2"
                 stroke-linecap="round"
               />
-              ${this.hours.map((d, g) => {
-      const b = e(g), C = a(d.wind_speed_kmh);
-      if (d.wind_bearing_deg === null || d.wind_speed_kmh < 0.4)
+              ${this.hours.map((p, f) => {
+      const v = e(f), j = a(p.wind_speed_kmh);
+      if (p.wind_bearing_deg === null || p.wind_speed_kmh < 0.4)
         return w`
                     <circle
-                      cx=${b}
-                      cy=${C}
+                      cx=${v}
+                      cy=${j}
                       r="3"
-                      fill="rgba(255, 255, 255, 0.7)"
+                      class="wg-wind-marker"
+                      fill-opacity="0.7"
                     />
                   `;
-      const tt = Pe(d.wind_bearing_deg);
+      const Y = Ye(p.wind_bearing_deg);
       return w`
                   <path
                     d="M 0 -7.2 L 5.2 6.4 L 0 3.3 L -5.2 6.4 Z"
-                    fill="#ffffff"
-                    transform="translate(${b}, ${C}) rotate(${tt})"
+                    class="wg-wind-marker"
+                    transform="translate(${v}, ${j}) rotate(${Y})"
                   />
                 `;
     })}
@@ -1633,14 +1703,14 @@ const E = 76, ze = 112, z = 272, P = 288, V = 44, O = 44, _t = 14, ot = class ot
             <g class="wg-scrubber-cursor">
               <polygon
                 points="${m - 6.5},0 ${m + 6.5},0 ${m},8.5"
-                fill="#ffffff"
+                class="wg-scrubber-head"
               />
               <line
                 x1=${m}
                 y1="7"
                 x2=${m}
-                y2=${P}
-                stroke="#ffffff"
+                y2=${H}
+                class="wg-scrubber-line"
                 stroke-width="2.6"
                 stroke-dasharray="9 6"
               />
@@ -1651,7 +1721,7 @@ const E = 76, ze = 112, z = 272, P = 288, V = 44, O = 44, _t = 14, ot = class ot
     `;
   }
 };
-ot.properties = {
+gt.properties = {
   hours: { attribute: !1 },
   sunWindows: { attribute: !1 },
   timeZone: { type: String },
@@ -1663,7 +1733,7 @@ ot.properties = {
   _viewportWidth: { state: !0 },
   _canScrollLeft: { state: !0 },
   _canScrollRight: { state: !0 }
-}, ot.styles = St`
+}, gt.styles = Ut`
     :host {
       display: block;
       position: relative;
@@ -1674,9 +1744,9 @@ ot.properties = {
     .wg-chart-shell {
       position: relative;
       width: 100%;
-      height: ${P}px;
+      height: ${H}px;
       overflow: hidden;
-      background: #132334;
+      background: var(--wg-band-night-plot);
     }
 
     .wg-scroll-viewport {
@@ -1685,7 +1755,7 @@ ot.properties = {
       overflow-x: auto;
       overflow-y: hidden;
       scrollbar-width: thin;
-      scrollbar-color: rgba(148, 179, 209, 0.3) transparent;
+      scrollbar-color: var(--wg-control-border) transparent;
       -webkit-overflow-scrolling: touch;
       cursor: crosshair;
     }
@@ -1699,40 +1769,57 @@ ot.properties = {
     }
 
     .wg-scroll-viewport::-webkit-scrollbar-thumb {
-      background: rgba(148, 179, 209, 0.28);
+      background: var(--wg-control-border);
       border-radius: 999px;
     }
 
     svg.wg-chart-svg {
       display: block;
-      height: ${P}px;
+      height: ${H}px;
     }
 
     .wg-axis-overlay {
       position: absolute;
-      top: ${E}px;
-      height: ${P - E}px;
+      top: ${T}px;
+      height: ${H - T}px;
       pointer-events: none;
       z-index: 3;
+      transition: opacity 0.2s ease;
+    }
+
+    .wg-axis-temp {
+      color: var(--wg-temp);
+    }
+
+    .wg-axis-wind {
+      color: var(--wg-wind);
+    }
+
+    .wg-axis-rain {
+      color: var(--wg-rain);
+    }
+
+    .wg-axis-dim {
+      opacity: 0.35;
     }
 
     .wg-axis-left {
       left: 0;
-      width: ${V + 8}px;
+      width: ${tt + 8}px;
       background: linear-gradient(
         90deg,
-        rgba(16, 31, 48, 0.92) 62%,
-        rgba(16, 31, 48, 0) 100%
+        var(--wg-axis-fade) 62%,
+        var(--wg-axis-fade-clear) 100%
       );
     }
 
     .wg-axis-right {
       right: 0;
-      width: ${O + 8}px;
+      width: ${et + 8}px;
       background: linear-gradient(
         270deg,
-        rgba(16, 31, 48, 0.92) 62%,
-        rgba(16, 31, 48, 0) 100%
+        var(--wg-axis-fade) 62%,
+        var(--wg-axis-fade-clear) 100%
       );
     }
 
@@ -1747,12 +1834,10 @@ ot.properties = {
 
     .wg-axis-left .wg-axis-unit {
       left: 10px;
-      color: #e8b93a;
     }
 
     .wg-axis-right .wg-axis-unit {
       right: 10px;
-      color: #dbe7f3;
     }
 
     .wg-axis-tick {
@@ -1766,12 +1851,10 @@ ot.properties = {
 
     .wg-axis-left .wg-axis-tick {
       left: 10px;
-      color: #e8b93a;
     }
 
     .wg-axis-right .wg-axis-tick {
       right: 10px;
-      color: #f1f5f9;
     }
 
     .wg-pan-btn {
@@ -1780,10 +1863,10 @@ ot.properties = {
       z-index: 4;
       width: 26px;
       height: 32px;
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      border: 1px solid var(--wg-control-border);
       border-radius: 6px;
-      background: rgba(9, 21, 37, 0.78);
-      color: #e2e8f0;
+      background: var(--wg-control-bg);
+      color: var(--wg-text);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1799,7 +1882,7 @@ ot.properties = {
     }
 
     .wg-pan-btn:hover {
-      background: rgba(18, 40, 66, 0.95);
+      background: var(--wg-panel);
     }
 
     .wg-pan-left {
@@ -1823,57 +1906,344 @@ ot.properties = {
       font-size: 9.5px;
       font-weight: 700;
       letter-spacing: 0.05em;
-      fill: #93c5fd;
+      fill: var(--wg-day-label);
+    }
+
+    .wg-band-day-strip {
+      fill: var(--wg-band-day-strip);
+    }
+
+    .wg-band-night-strip {
+      fill: var(--wg-band-night-strip);
+    }
+
+    .wg-band-day-plot {
+      fill: var(--wg-band-day-plot);
+    }
+
+    .wg-band-night-plot {
+      fill: var(--wg-band-night-plot);
+    }
+
+    .wg-grid-vertical {
+      stroke: var(--wg-grid-vertical);
+    }
+
+    .wg-grid-horizontal {
+      stroke: var(--wg-grid);
+    }
+
+    .wg-strip-rule {
+      stroke: var(--wg-strip-rule);
+    }
+
+    .wg-strip-icon {
+      filter: var(--wg-icon-filter, none);
+    }
+
+    .wg-hour-label {
+      fill: var(--wg-text);
+    }
+
+    .wg-rain-area {
+      fill: var(--wg-rain-fill);
+    }
+
+    .wg-rain-stroke {
+      stroke: var(--wg-rain-stroke);
+    }
+
+    .wg-temp-line {
+      stroke: var(--wg-temp);
+    }
+
+    .wg-wind-line {
+      stroke: var(--wg-wind-line);
+    }
+
+    .wg-wind-marker {
+      fill: var(--wg-wind);
+    }
+
+    .wg-scrubber-head {
+      fill: var(--wg-text);
+    }
+
+    .wg-scrubber-line {
+      stroke: var(--wg-text);
     }
   `;
-let yt = ot;
-customElements.get("wg-forecast-chart") || customElements.define("wg-forecast-chart", yt);
-function Be({
+let Et = gt;
+customElements.get("wg-forecast-chart") || customElements.define("wg-forecast-chart", Et);
+const Ct = 3, ai = ["wind", "humidity", "dew_point"], Lt = [
+  { id: "wind", label: "Wind" },
+  { id: "wind_gust", label: "Wind gust" },
+  { id: "humidity", label: "Humidity" },
+  { id: "dew_point", label: "Dew point" },
+  { id: "feels_like", label: "Feels like" },
+  { id: "uv", label: "UV index" },
+  { id: "rain_amount", label: "Rain amount" }
+], li = new Set(Lt.map((s) => s.id));
+function Tt(s) {
+  if (!Array.isArray(s)) return [...ai];
+  const t = [];
+  for (const e of s)
+    typeof e == "string" && li.has(e) && !t.includes(e) && t.push(e);
+  return t.slice(0, Ct);
+}
+function ci(s) {
+  return s < 3 ? "Low" : s < 6 ? "Moderate" : s < 8 ? "High" : s < 11 ? "Very High" : "Extreme";
+}
+const R = (s) => s != null && Number.isFinite(s);
+function hi(s, t, e, i) {
+  var c;
+  const n = (l) => e ? (i == null ? void 0 : i[l]) ?? null : null, r = ((c = Lt.find((l) => l.id === s)) == null ? void 0 : c.label) ?? s, o = (l) => R(l) ? `${Math.round(l)}°C` : "--°C", a = (l) => R(l) ? `${Math.round(l)} km/h` : "-- km/h";
+  switch (s) {
+    case "wind": {
+      const l = n("wind_speed_kmh") ?? t.wind_speed_kmh, d = n("wind_direction") ?? t.wind_direction ?? "", h = R(l) && l <= 0.4 && !d ? "Calm" : `${d ? `${d} ` : ""}${a(l)}`;
+      return { id: s, label: r, value: h };
+    }
+    case "wind_gust":
+      return {
+        id: s,
+        label: r,
+        value: a(n("wind_gust_kmh") ?? t.wind_gust_kmh)
+      };
+    case "humidity": {
+      const l = n("humidity") ?? t.humidity;
+      return { id: s, label: r, value: R(l) ? `${Math.round(l)}%` : "--%" };
+    }
+    case "dew_point":
+      return {
+        id: s,
+        label: r,
+        value: o(n("dew_point") ?? t.dew_point)
+      };
+    case "feels_like":
+      return {
+        id: s,
+        label: r,
+        value: o(n("feels_like") ?? t.feels_like)
+      };
+    case "uv": {
+      const l = t.uv_index;
+      return {
+        id: s,
+        label: r,
+        value: R(l) ? `${Math.round(l)} ${ci(l)}` : "--"
+      };
+    }
+    case "rain_amount": {
+      const l = t.rain_min_mm, d = t.rain_max_mm;
+      let h = "-- mm";
+      return R(l) && R(d) && d > l ? h = `${l}–${d} mm` : R(d) ? h = `${d} mm` : R(l) && (h = `${l} mm`), { id: s, label: r, value: h };
+    }
+  }
+}
+function di({
   point: s,
   isFirstHour: t,
   currentObs: e,
-  timeZone: i
+  timeZone: i,
+  metrics: n
 }) {
-  const n = t && (e == null ? void 0 : e.temperature) !== null && (e == null ? void 0 : e.temperature) !== void 0 ? e.temperature : s.temperature, r = t && (e == null ? void 0 : e.humidity) !== null && (e == null ? void 0 : e.humidity) !== void 0 ? e.humidity : s.humidity, o = t && (e == null ? void 0 : e.dew_point) !== null && (e == null ? void 0 : e.dew_point) !== void 0 ? e.dew_point : s.dew_point, a = t && (e == null ? void 0 : e.wind_speed_kmh) !== null && (e == null ? void 0 : e.wind_speed_kmh) !== void 0 ? e.wind_speed_kmh : s.wind_speed_kmh, l = (t && (e != null && e.wind_direction) ? e.wind_direction : null) ?? s.wind_direction ?? "", h = Qt(
+  const r = t && (e == null ? void 0 : e.temperature) !== null && (e == null ? void 0 : e.temperature) !== void 0 ? e.temperature : s.temperature, o = me(
     s.icon_descriptor,
     s.condition,
     s.is_night
-  ), u = n != null ? `${Math.round(n)}°` : "--°", c = `${Math.round(s.rain_chance)}%`, f = Te(s.epoch_ms, i), _ = a <= 0.4 && !l ? "Calm" : `${l ? `${l} ` : ""}${Math.round(a)} km/h`, p = r != null ? `${Math.round(r)}%` : "--%", y = o != null ? `${Math.round(o)}°C` : "--°C";
-  return A`
-    <div class="wg-summary-panel" role="region" aria-label="Selected hour forecast details">
+  ), a = r != null ? `${Math.round(r)}°` : "--°", c = `${Math.round(s.rain_chance)}%`, l = Qe(s.epoch_ms, i);
+  return $`
+    <div
+      class="wg-summary-panel ${n.length === 0 ? "wg-no-metrics" : ""}"
+      role="region"
+      aria-label="Selected hour forecast details"
+      style="--wg-metric-count: ${Math.max(1, n.length)}"
+    >
       <div class="wg-summary-left">
         <div class="wg-summary-icon">
-          ${ke(h, 42)}
+          ${Ve(o, 42)}
         </div>
-        <div class="wg-summary-temp">${u}</div>
+        <div class="wg-summary-temp">${a}</div>
       </div>
 
       <div class="wg-summary-center">
-        <div class="wg-summary-time">${f}</div>
+        <div class="wg-summary-time">${l}</div>
         <div class="wg-summary-rain" title="Chance of precipitation">
-          <span class="wg-droplet">${Me(17)}</span>
+          <span class="wg-droplet">${Ge(17)}</span>
           <span class="wg-summary-rain-val">${c}</span>
         </div>
       </div>
 
-      <div class="wg-summary-metrics">
-        <div class="wg-metric-row">
-          <span class="wg-metric-label">WIND</span>
-          <span class="wg-metric-value">${_}</span>
-        </div>
-        <div class="wg-metric-row">
-          <span class="wg-metric-label">HUMIDITY</span>
-          <span class="wg-metric-value">${p}</span>
-        </div>
-        <div class="wg-metric-row">
-          <span class="wg-metric-label">DEW POINT</span>
-          <span class="wg-metric-value">${y}</span>
-        </div>
-      </div>
+      ${n.length > 0 ? $`
+            <div class="wg-summary-metrics">
+              ${n.map((d) => {
+    const { label: h, value: g } = hi(d, s, t, e);
+    return $`
+                  <div class="wg-metric-row">
+                    <span class="wg-metric-label">${h}</span>
+                    <span class="wg-metric-value">${g}</span>
+                  </div>
+                `;
+  })}
+            </div>
+          ` : b}
     </div>
   `;
 }
-const at = class at extends U {
+const Ot = [
+  { slot: "background", label: "Background" },
+  { slot: "daytime", label: "Daytime shading" },
+  { slot: "temperature", label: "Temperature" },
+  { slot: "rain", label: "Chance of rain" },
+  { slot: "wind", label: "Wind" },
+  { slot: "text", label: "Text" }
+], Nt = [
+  {
+    id: "dusk",
+    name: "Dusk",
+    colors: {
+      background: "#1b1a2e",
+      daytime: "#3a3762",
+      temperature: "#ff8f6b",
+      rain: "#59c3c3",
+      wind: "#d9d4ff",
+      text: "#f3f1fa"
+    }
+  },
+  {
+    id: "midnight",
+    name: "Midnight",
+    colors: {
+      background: "#0f2137",
+      daytime: "#2b5272",
+      temperature: "#f5be36",
+      rain: "#4cc9f0",
+      wind: "#ffffff",
+      text: "#f8fafc"
+    }
+  },
+  {
+    id: "forest",
+    name: "Forest",
+    colors: {
+      background: "#142019",
+      daytime: "#2c4434",
+      temperature: "#f4c95d",
+      rain: "#7cb8e8",
+      wind: "#e6efe2",
+      text: "#eef4ec"
+    }
+  },
+  {
+    id: "ember",
+    name: "Ember",
+    colors: {
+      background: "#211816",
+      daytime: "#46322b",
+      temperature: "#ffb15c",
+      rain: "#74b9e6",
+      wind: "#f6e9df",
+      text: "#f8efe9"
+    }
+  },
+  {
+    id: "daylight",
+    name: "Daylight",
+    colors: {
+      background: "#e4eaf2",
+      daytime: "#ffffff",
+      temperature: "#d9622b",
+      rain: "#2b7fc4",
+      wind: "#2f3b4a",
+      text: "#1c2633"
+    }
+  }
+], ye = "dusk", ui = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
+function $e(s) {
+  if (typeof s != "string") return null;
+  const t = s.trim();
+  if (!ui.test(t)) return null;
+  if (t.length === 4) {
+    const [, e, i, n] = t;
+    return `#${e}${e}${i}${i}${n}${n}`.toLowerCase();
+  }
+  return t.toLowerCase();
+}
+function zt(s) {
+  return Nt.find((t) => t.id === s) ?? Nt.find((t) => t.id === ye);
+}
+function xe(s, t) {
+  const e = { ...zt(s).colors };
+  for (const { slot: i } of Ot) {
+    const n = $e(t == null ? void 0 : t[i]);
+    n && (e[i] = n);
+  }
+  return e;
+}
+function oe(s, t) {
+  const e = zt(s).colors, i = {};
+  for (const { slot: n } of Ot) {
+    const r = $e(t == null ? void 0 : t[n]);
+    r && r !== e[n] && (i[n] = r);
+  }
+  return i;
+}
+function pt(s) {
+  const t = parseInt(s.slice(1), 16);
+  return [t >> 16 & 255, t >> 8 & 255, t & 255];
+}
+function pi([s, t, e]) {
+  return `#${[s, t, e].map((i) => Math.round(Math.max(0, Math.min(255, i))).toString(16).padStart(2, "0")).join("")}`;
+}
+function A(s, t, e) {
+  const i = pt(s), n = pt(t);
+  return pi([0, 1, 2].map((r) => i[r] + (n[r] - i[r]) * e));
+}
+function M(s, t) {
+  const [e, i, n] = pt(s);
+  return `rgba(${e}, ${i}, ${n}, ${t})`;
+}
+function gi(s) {
+  const [t, e, i] = pt(s).map((n) => {
+    const r = n / 255;
+    return r <= 0.03928 ? r / 12.92 : ((r + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * t + 0.7152 * e + 0.0722 * i;
+}
+function fi(s) {
+  const { background: t, daytime: e, temperature: i, rain: n, wind: r, text: o } = s, a = gi(t) < 0.4, c = a ? A(t, "#000000", 0.38) : A(t, o, 0.05), l = a ? A(t, "#000000", 0.45) : A(t, o, 0.07), d = A(t, e, 0.12);
+  return {
+    "--wg-bg": t,
+    "--wg-panel": c,
+    "--wg-legend-bg": l,
+    "--wg-text": o,
+    "--wg-text-muted": A(o, t, 0.4),
+    "--wg-border": M(o, 0.12),
+    "--wg-shadow": a ? "rgba(0, 0, 0, 0.36)" : "rgba(0, 0, 0, 0.12)",
+    "--wg-temp": i,
+    "--wg-rain": n,
+    "--wg-wind": r,
+    "--wg-rain-fill": M(A(n, t, 0.2), 0.48),
+    "--wg-rain-stroke": M(n, 0.55),
+    "--wg-wind-line": M(r, 0.25),
+    "--wg-band-day-strip": e,
+    "--wg-band-night-strip": A(t, e, 0.3),
+    "--wg-band-day-plot": A(t, e, 0.45),
+    "--wg-band-night-plot": d,
+    "--wg-axis-fade": M(d, 0.92),
+    "--wg-axis-fade-clear": M(d, 0),
+    "--wg-grid": M(o, 0.075),
+    "--wg-grid-vertical": M(o, 0.06),
+    "--wg-strip-rule": M(A(o, e, 0.3), 0.36),
+    "--wg-day-label": A(n, o, 0.5),
+    "--wg-control-bg": M(c, 0.82),
+    "--wg-control-border": M(o, 0.18),
+    "--wg-icon-filter": a ? "none" : "drop-shadow(0 0 0.6px rgba(0, 0, 0, 0.55)) drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.18))",
+    "--wg-skeleton-a": M(A(t, e, 0.4), 0.55),
+    "--wg-skeleton-b": M(A(t, e, 0.8), 0.75)
+  };
+}
+const ft = class ft extends F {
   constructor() {
     super(), this._config = {
       type: "custom:weather-graph-card"
@@ -1883,17 +2253,124 @@ const at = class at extends U {
     this._config = { ...t };
   }
   _update(t, e) {
-    const i = {
-      ...this._config,
-      [t]: e
-    };
-    this._config = i, this.dispatchEvent(
+    const i = { ...this._config };
+    e === void 0 ? delete i[t] : i[t] = e, this._emit(i);
+  }
+  _emit(t) {
+    this._config = t, this.dispatchEvent(
       new CustomEvent("config-changed", {
-        detail: { config: i },
+        detail: { config: t },
         bubbles: !0,
         composed: !0
       })
     );
+  }
+  _setMetric(t, e) {
+    const i = Tt(this._config.metrics);
+    for (; i.length < Ct; ) i.push("");
+    i[t] = e;
+    const n = i.filter(
+      (r, o) => r !== "" && i.indexOf(r) === o
+    );
+    this._update("metrics", n);
+  }
+  _setPalette(t) {
+    const e = { ...this._config, palette: t };
+    delete e.colors, this._emit(e);
+  }
+  _setColor(t, e) {
+    const i = oe(this._config.palette, {
+      ...this._config.colors,
+      [t]: e
+    });
+    this._update("colors", Object.keys(i).length > 0 ? i : void 0);
+  }
+  _renderMetricsSection() {
+    const t = Tt(this._config.metrics);
+    return $`
+      <div class="field">
+        <label>Summary Fields</label>
+        <div class="row-3">
+          ${Array.from({ length: Ct }, (e, i) => {
+      const n = i < t.length ? t[i] : "";
+      return $`
+              <select
+                aria-label="Summary field ${i + 1}"
+                .value=${n}
+                @change=${(r) => this._setMetric(i, r.target.value)}
+              >
+                <option value="" ?selected=${n === ""}>None</option>
+                ${Lt.map(
+        (r) => $`
+                    <option
+                      value=${r.id}
+                      ?selected=${n === r.id}
+                      ?disabled=${n !== r.id && t.includes(r.id)}
+                    >
+                      ${r.label}
+                    </option>
+                  `
+      )}
+              </select>
+            `;
+    })}
+        </div>
+        <span class="hint">Shown beside the selected hour's time and chance of rain.</span>
+      </div>
+    `;
+  }
+  _renderColorsSection() {
+    const t = zt(this._config.palette), e = oe(this._config.palette, this._config.colors), i = xe(this._config.palette, this._config.colors), n = Object.keys(e).length > 0;
+    return $`
+      <div class="field">
+        <div class="section-head">
+          <label for="wg-palette">Colour Palette</label>
+          <button
+            type="button"
+            class="revert-btn"
+            ?disabled=${!n}
+            @click=${() => this._update("colors", void 0)}
+          >
+            Revert to ${t.name}
+          </button>
+        </div>
+        <select
+          id="wg-palette"
+          .value=${t.id}
+          @change=${(r) => this._setPalette(r.target.value)}
+        >
+          ${Nt.map(
+      (r) => $`
+              <option value=${r.id} ?selected=${r.id === t.id}>
+                ${r.name}${r.id === ye ? " (default)" : ""}
+              </option>
+            `
+    )}
+        </select>
+        <div class="swatches">
+          ${Ot.map(
+      ({ slot: r, label: o }) => $`
+              <label class="swatch">
+                <input
+                  type="color"
+                  .value=${i[r]}
+                  @input=${(a) => this._setColor(r, a.target.value)}
+                />
+                <span class="swatch-text">
+                  <span>${o}</span>
+                  <span class="swatch-hex ${e[r] ? "custom" : ""}">
+                    ${i[r]}${e[r] ? " (custom)" : ""}
+                  </span>
+                </span>
+              </label>
+            `
+    )}
+        </div>
+        <span class="hint">
+          Pick a built-in palette, then adjust any colour. Changing palette clears custom colours.
+        </span>
+      </div>
+    `;
   }
   render() {
     var e;
@@ -1901,7 +2378,7 @@ const at = class at extends U {
       const r = i.endsWith("_hourly") ? -1 : 0, o = n.endsWith("_hourly") ? -1 : 0;
       return r !== o ? r - o : i.localeCompare(n);
     });
-    return A`
+    return $`
       <div class="editor-grid">
         <div class="field">
           <label for="wg-entity">Weather Entity (BOM Hourly preferred)</label>
@@ -1914,7 +2391,7 @@ const at = class at extends U {
             ${t.map((i) => {
       var r, o, a;
       const n = ((a = (o = (r = this.hass) == null ? void 0 : r.states[i]) == null ? void 0 : o.attributes) == null ? void 0 : a.friendly_name) || i;
-      return A`
+      return $`
                 <option value=${i} ?selected=${this._config.entity === i}>
                   ${n} (${i})
                 </option>
@@ -2007,14 +2484,16 @@ const at = class at extends U {
             </label>
           </div>
         </div>
+
+        ${this._renderMetricsSection()} ${this._renderColorsSection()}
       </div>
     `;
   }
 };
-at.properties = {
+ft.properties = {
   hass: { attribute: !1 },
   _config: { state: !0 }
-}, at.styles = St`
+}, ft.styles = Ut`
     :host {
       display: block;
       font-family: inherit;
@@ -2074,13 +2553,91 @@ at.properties = {
       font-size: 13.5px;
       cursor: pointer;
     }
+
+    .row-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 8px 12px;
+    }
+
+    .swatch {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .swatch input[type="color"] {
+      width: 34px;
+      height: 28px;
+      padding: 0;
+      border: 1px solid var(--divider-color, rgba(148, 163, 184, 0.3));
+      border-radius: 6px;
+      background: none;
+      cursor: pointer;
+      flex: none;
+    }
+
+    .swatch-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.25;
+    }
+
+    .swatch-hex {
+      font-size: 11px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--secondary-text-color, #94a3b8);
+    }
+
+    .swatch-hex.custom {
+      color: var(--primary-color, #03a9f4);
+    }
+
+    .revert-btn {
+      appearance: none;
+      border: 1px solid var(--divider-color, rgba(148, 163, 184, 0.3));
+      background: transparent;
+      color: var(--primary-text-color, #f8fafc);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .revert-btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    @media (max-width: 420px) {
+      .row-3 {
+        grid-template-columns: 1fr;
+      }
+    }
   `;
-let $t = at;
+let Pt = ft;
 customElements.get("weather-graph-card-editor") || customElements.define(
   "weather-graph-card-editor",
-  $t
+  Pt
 );
-const Fe = "1.0.1", lt = class lt extends U {
+const mi = "1.1.0", mt = class mt extends F {
   constructor() {
     super(), this._subscribedKey = "", this._subscribing = !1, this._config = {
       type: "custom:weather-graph-card",
@@ -2098,7 +2655,7 @@ const Fe = "1.0.1", lt = class lt extends U {
   static getStubConfig(t) {
     return {
       type: "custom:weather-graph-card",
-      entity: Xt(t) ?? void 0,
+      entity: ne(t) ?? void 0,
       title: "Next 48 Hours",
       hours_to_show: 48,
       visible_hours: 24,
@@ -2149,7 +2706,7 @@ const Fe = "1.0.1", lt = class lt extends U {
   async _ensureSubscription() {
     var n;
     if (!((n = this.hass) != null && n.connection) || this._subscribing) return;
-    const t = Xt(
+    const t = ne(
       this.hass,
       this._config.entity
     ), e = Math.max(12, Math.min(72, this._config.hours_to_show ?? 48)), i = `${t ?? ""}::${this._config.bom_entry_id ?? ""}::${e}`;
@@ -2176,7 +2733,7 @@ const Fe = "1.0.1", lt = class lt extends U {
           this._unsubForecast = await this.hass.connection.subscribeMessage(
             (r) => {
               if (!this.hass) return;
-              const o = Ue(
+              const o = si(
                 r.forecast ?? [],
                 this.hass,
                 t,
@@ -2199,24 +2756,24 @@ const Fe = "1.0.1", lt = class lt extends U {
     }
   }
   _resolveCurrentObservation(t) {
-    var u;
+    var d;
     if (!this.hass) return t;
-    const e = (c) => {
-      var p, y;
-      if (!c) return null;
-      const f = (y = (p = this.hass) == null ? void 0 : p.states[c]) == null ? void 0 : y.state;
-      if (f === void 0) return null;
-      const _ = Number(f);
+    const e = (h) => {
+      var u, y;
+      if (!h) return null;
+      const g = (y = (u = this.hass) == null ? void 0 : u.states[h]) == null ? void 0 : y.state;
+      if (g === void 0) return null;
+      const _ = Number(g);
       return Number.isFinite(_) ? _ : null;
-    }, i = e(this._config.temperature_entity), n = e(this._config.humidity_entity), r = e(this._config.wind_speed_entity), o = this._config.wind_direction_entity ? (u = this.hass.states[this._config.wind_direction_entity]) == null ? void 0 : u.state : void 0, a = o ? kt(o) : { cardinal: null, degrees: null };
+    }, i = e(this._config.temperature_entity), n = e(this._config.humidity_entity), r = e(this._config.wind_speed_entity), o = this._config.wind_direction_entity ? (d = this.hass.states[this._config.wind_direction_entity]) == null ? void 0 : d.state : void 0, a = o ? Wt(o) : { cardinal: null, degrees: null };
     if (i === null && n === null && r === null && !a.cardinal)
       return t;
-    const l = i ?? (t == null ? void 0 : t.temperature) ?? null, h = n ?? (t == null ? void 0 : t.humidity) ?? null;
+    const c = i ?? (t == null ? void 0 : t.temperature) ?? null, l = n ?? (t == null ? void 0 : t.humidity) ?? null;
     return {
-      temperature: l,
+      temperature: c,
       feels_like: (t == null ? void 0 : t.feels_like) ?? null,
-      humidity: h,
-      dew_point: ee(l, h) ?? (t == null ? void 0 : t.dew_point) ?? null,
+      humidity: l,
+      dew_point: _e(c, l) ?? (t == null ? void 0 : t.dew_point) ?? null,
       wind_speed_kmh: r ?? (t == null ? void 0 : t.wind_speed_kmh) ?? null,
       wind_gust_kmh: (t == null ? void 0 : t.wind_gust_kmh) ?? null,
       wind_direction: a.cardinal ?? (t == null ? void 0 : t.wind_direction) ?? null,
@@ -2228,30 +2785,33 @@ const Fe = "1.0.1", lt = class lt extends U {
     this._selectedIndex = t.detail.index;
   }
   render() {
-    var r, o, a, l, h, u, c, f, _, p, y, v, S;
-    const t = this._config.title || "Next 48 Hours", e = ((r = this._payload) == null ? void 0 : r.hourly) ?? [], i = e[Math.max(0, Math.min(e.length - 1, this._selectedIndex))] ?? null, n = this._config.show_location && ((a = (o = this._payload) == null ? void 0 : o.location) != null && a.name) ? `${this._payload.location.name}${this._payload.location.state ? `, ${this._payload.location.state}` : ""}` : "";
-    return A`
-      <div class="wg-card">
+    var o, a, c, l, d, h, g, _, u, y, k, S, m;
+    const t = this._config.title || "Next 48 Hours", e = ((o = this._payload) == null ? void 0 : o.hourly) ?? [], i = e[Math.max(0, Math.min(e.length - 1, this._selectedIndex))] ?? null, n = this._config.show_location && ((c = (a = this._payload) == null ? void 0 : a.location) != null && c.name) ? `${this._payload.location.name}${this._payload.location.state ? `, ${this._payload.location.state}` : ""}` : "", r = fi(
+      xe(this._config.palette, this._config.colors)
+    );
+    return $`
+      <div class="wg-card" style=${je(r)}>
         <div class="wg-card-header">
           <h2 class="wg-card-title">${t}</h2>
-          ${n ? A`<span class="wg-card-subtitle">${n}</span>` : x}
+          ${n ? $`<span class="wg-card-subtitle">${n}</span>` : b}
         </div>
 
-        ${this._loading ? A`<div class="wg-skeleton" aria-label="Loading forecast"></div>` : this._error ? A`<div class="wg-status-box">${this._error}</div>` : i ? A`
+        ${this._loading ? $`<div class="wg-skeleton" aria-label="Loading forecast"></div>` : this._error ? $`<div class="wg-status-box">${this._error}</div>` : i ? $`
               <div class="wg-card-body">
-                ${Be({
+                ${di({
       point: i,
       isFirstHour: this._selectedIndex === 0,
       currentObs: this._resolveCurrentObservation(
         ((l = this._payload) == null ? void 0 : l.current) ?? null
       ),
-      timeZone: ((u = (h = this._payload) == null ? void 0 : h.location) == null ? void 0 : u.timezone) ?? ((f = (c = this.hass) == null ? void 0 : c.config) == null ? void 0 : f.time_zone) ?? "Australia/Sydney"
+      timeZone: ((h = (d = this._payload) == null ? void 0 : d.location) == null ? void 0 : h.timezone) ?? ((_ = (g = this.hass) == null ? void 0 : g.config) == null ? void 0 : _.time_zone) ?? "Australia/Sydney",
+      metrics: Tt(this._config.metrics)
     })}
 
                 <wg-forecast-chart
                   .hours=${e}
-                  .sunWindows=${((_ = this._payload) == null ? void 0 : _.sun_windows) ?? []}
-                  .timeZone=${((y = (p = this._payload) == null ? void 0 : p.location) == null ? void 0 : y.timezone) ?? ((S = (v = this.hass) == null ? void 0 : v.config) == null ? void 0 : S.time_zone) ?? "Australia/Sydney"}
+                  .sunWindows=${((u = this._payload) == null ? void 0 : u.sun_windows) ?? []}
+                  .timeZone=${((k = (y = this._payload) == null ? void 0 : y.location) == null ? void 0 : k.timezone) ?? ((m = (S = this.hass) == null ? void 0 : S.config) == null ? void 0 : m.time_zone) ?? "Australia/Sydney"}
                   .selectedIndex=${this._selectedIndex}
                   .visibleHours=${this._config.visible_hours ?? 24}
                   .showTemperature=${this._showTemperature}
@@ -2291,12 +2851,12 @@ const Fe = "1.0.1", lt = class lt extends U {
       this._showWind = !this._showWind;
     }}
                   >
-                    ${Ce(15)}
+                    ${Ke(15)}
                     <span>Wind</span>
                   </button>
                 </div>
               </div>
-            ` : A`
+            ` : $`
               <div class="wg-status-box">
                 No hourly forecast points available for the selected weather entity.
               </div>
@@ -2305,7 +2865,7 @@ const Fe = "1.0.1", lt = class lt extends U {
     `;
   }
 };
-lt.properties = {
+mt.properties = {
   hass: { attribute: !1 },
   samplePayload: { attribute: !1 },
   _config: { state: !0 },
@@ -2316,7 +2876,7 @@ lt.properties = {
   _showWind: { state: !0 },
   _loading: { state: !0 },
   _error: { state: !0 }
-}, lt.styles = St`
+}, mt.styles = Ut`
     :host {
       display: block;
       font-family: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont,
@@ -2324,14 +2884,12 @@ lt.properties = {
     }
 
     .wg-card {
-      background: #0f2137;
-      color: #f8fafc;
+      container: wg-card / inline-size;
+      background: var(--wg-bg);
+      color: var(--wg-text);
       border-radius: var(--ha-card-border-radius, 14px);
-      border: 1px solid rgba(125, 169, 212, 0.14);
-      box-shadow: var(
-        --ha-card-box-shadow,
-        0 10px 28px rgba(3, 10, 20, 0.36)
-      );
+      border: 1px solid var(--wg-border);
+      box-shadow: var(--ha-card-box-shadow, 0 10px 28px var(--wg-shadow));
       overflow: hidden;
     }
 
@@ -2348,13 +2906,13 @@ lt.properties = {
       font-size: 21px;
       font-weight: 700;
       letter-spacing: -0.01em;
-      color: #ffffff;
+      color: var(--wg-text);
     }
 
     .wg-card-subtitle {
       font-size: 12px;
       font-weight: 500;
-      color: #8ea6c2;
+      color: var(--wg-text-muted);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -2363,12 +2921,16 @@ lt.properties = {
     .wg-summary-panel {
       margin: 0 14px 14px;
       padding: 14px 18px;
-      background: #091525;
+      background: var(--wg-panel);
       border-radius: 10px;
       display: grid;
       grid-template-columns: auto minmax(110px, 1fr) auto;
       align-items: center;
       gap: 18px;
+    }
+
+    .wg-summary-panel.wg-no-metrics {
+      grid-template-columns: auto 1fr;
     }
 
     .wg-summary-left {
@@ -2384,13 +2946,14 @@ lt.properties = {
       align-items: center;
       justify-content: center;
       height: 42px;
+      filter: var(--wg-icon-filter, none);
     }
 
     .wg-summary-temp {
       font-size: 31px;
       font-weight: 600;
       line-height: 1.05;
-      color: #f5be36;
+      color: var(--wg-temp);
       font-variant-numeric: tabular-nums;
     }
 
@@ -2405,7 +2968,7 @@ lt.properties = {
       font-size: 18px;
       font-weight: 700;
       letter-spacing: 0.02em;
-      color: #ffffff;
+      color: var(--wg-text);
     }
 
     .wg-summary-rain {
@@ -2423,7 +2986,7 @@ lt.properties = {
       font-size: 30px;
       font-weight: 600;
       line-height: 1.05;
-      color: #4cc9f0;
+      color: var(--wg-rain);
       font-variant-numeric: tabular-nums;
     }
 
@@ -2443,14 +3006,14 @@ lt.properties = {
       font-size: 12.5px;
       font-weight: 500;
       letter-spacing: 0.03em;
-      color: #8da4be;
+      color: var(--wg-text-muted);
       text-transform: uppercase;
     }
 
     .wg-metric-value {
       font-size: 15.5px;
       font-weight: 700;
-      color: #ffffff;
+      color: var(--wg-text);
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
@@ -2460,8 +3023,8 @@ lt.properties = {
       align-items: center;
       justify-content: space-around;
       padding: 12px 14px 14px;
-      background: #081525;
-      border-top: 1px solid rgba(125, 169, 212, 0.14);
+      background: var(--wg-legend-bg);
+      border-top: 1px solid var(--wg-border);
       gap: 8px;
     }
 
@@ -2493,6 +3056,7 @@ lt.properties = {
       bottom: 0;
       height: 3px;
       border-radius: 2px;
+      background: currentColor;
       transition: opacity 0.18s ease, transform 0.18s ease;
     }
 
@@ -2506,33 +3070,21 @@ lt.properties = {
     }
 
     .wg-legend-temp {
-      color: #f5be36;
-    }
-
-    .wg-legend-temp::after {
-      background: #f5be36;
+      color: var(--wg-temp);
     }
 
     .wg-legend-rain {
-      color: #4cc9f0;
-    }
-
-    .wg-legend-rain::after {
-      background: #4cc9f0;
+      color: var(--wg-rain);
     }
 
     .wg-legend-wind {
-      color: #ffffff;
-    }
-
-    .wg-legend-wind::after {
-      background: #ffffff;
+      color: var(--wg-wind);
     }
 
     .wg-status-box {
       padding: 36px 22px;
       text-align: center;
-      color: #9fb5cc;
+      color: var(--wg-text-muted);
       font-size: 14px;
       line-height: 1.5;
     }
@@ -2543,9 +3095,9 @@ lt.properties = {
       border-radius: 10px;
       background: linear-gradient(
         90deg,
-        rgba(24, 46, 71, 0.55) 25%,
-        rgba(38, 70, 104, 0.75) 50%,
-        rgba(24, 46, 71, 0.55) 75%
+        var(--wg-skeleton-a) 25%,
+        var(--wg-skeleton-b) 50%,
+        var(--wg-skeleton-a) 75%
       );
       background-size: 200% 100%;
       animation: wg-shimmer 1.5s infinite linear;
@@ -2560,19 +3112,28 @@ lt.properties = {
       }
     }
 
-    @media (max-width: 440px) {
-      .wg-summary-panel {
+    @container wg-card (max-width: 480px) {
+      .wg-summary-panel,
+      .wg-summary-panel.wg-no-metrics {
         grid-template-columns: auto 1fr;
         gap: 12px 16px;
         padding: 12px 14px;
       }
 
+      .wg-summary-center {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-evenly;
+        gap: 6px 16px;
+      }
+
       .wg-summary-metrics {
         grid-column: 1 / -1;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(var(--wg-metric-count, 3), 1fr);
         gap: 8px;
         padding-top: 8px;
-        border-top: 1px solid rgba(148, 179, 209, 0.14);
+        border-top: 1px solid var(--wg-border);
       }
 
       .wg-metric-row {
@@ -2586,8 +3147,8 @@ lt.properties = {
       }
     }
   `;
-let xt = lt;
-customElements.get("weather-graph-card") || customElements.define("weather-graph-card", xt);
+let It = mt;
+customElements.get("weather-graph-card") || customElements.define("weather-graph-card", It);
 window.customCards = window.customCards || [];
 window.customCards.some((s) => s.type === "weather-graph-card") || window.customCards.push({
   type: "weather-graph-card",
@@ -2596,10 +3157,10 @@ window.customCards.some((s) => s.type === "weather-graph-card") || window.custom
   preview: !0
 });
 console.info(
-  `%c WEATHER-GRAPH-CARD %c v${Fe} `,
-  "background:#0f2137;color:#f5be36;font-weight:700;padding:2px 6px;border-radius:4px 0 0 4px;",
-  "background:#4cc9f0;color:#091525;font-weight:700;padding:2px 6px;border-radius:0 4px 4px 0;"
+  `%c WEATHER-GRAPH-CARD %c v${mi} `,
+  "background:#1b1a2e;color:#ff8f6b;font-weight:700;padding:2px 6px;border-radius:4px 0 0 4px;",
+  "background:#59c3c3;color:#1b1a2e;font-weight:700;padding:2px 6px;border-radius:0 4px 4px 0;"
 );
 export {
-  xt as WeatherGraphCard
+  It as WeatherGraphCard
 };

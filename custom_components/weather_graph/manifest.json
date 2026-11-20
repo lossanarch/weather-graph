@@ -10,5 +10,6 @@
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/lossanarch/weather-graph/issues",
   "requirements": [],
-  "version": "1.0.1"
+  "single_config_entry": true,
+  "version": "1.1.0"
 }
