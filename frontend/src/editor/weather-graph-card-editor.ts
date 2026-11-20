@@ -12,6 +12,7 @@ import {
   resolvePalette,
 } from "../theme/palette";
 import { assignPaletteColors, paletteToCsv, parsePaletteInput } from "../theme/palette-import";
+import { setPreviewPaletteMode } from "../theme/preview-mode";
 import type { HomeAssistant, SummaryMetric, WeatherGraphCardConfig } from "../types";
 import {
   MAX_SUMMARY_METRICS,
@@ -413,8 +414,19 @@ export class WeatherGraphCardEditor extends LitElement {
     return resolvePalette(paletteId, overrides);
   }
 
+  connectedCallback(): void {
+    super.connectedCallback();
+    if (this._paletteMode) setPreviewPaletteMode(this._paletteMode);
+  }
+
+  disconnectedCallback(): void {
+    setPreviewPaletteMode(undefined);
+    super.disconnectedCallback();
+  }
+
   private _setMode(mode: PaletteMode): void {
     this._paletteMode = mode;
+    setPreviewPaletteMode(mode);
     this._tapSlot = undefined;
     this._pasteNote = undefined;
   }
@@ -745,7 +757,8 @@ export class WeatherGraphCardEditor extends LitElement {
         </div>
         <span class="hint">
           The card uses the dark palette when Home Assistant is in dark mode (by default it follows
-          your system) and the light palette otherwise. Pick a built-in palette, then adjust any
+          your system) and the light palette otherwise. While editing, the preview shows the
+          palette selected here. Pick a built-in palette, then adjust any
           colour. Drag the handles (or tap two) to swap colours. Changing palette clears custom
           colours.
         </span>

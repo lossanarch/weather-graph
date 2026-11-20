@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import "../editor/weather-graph-card-editor";
+import "../weather-graph-card";
+import { SAMPLE_BOM_PROFILES } from "../dev/bom-sample-profiles";
 import type { WeatherGraphCardEditor } from "../editor/weather-graph-card-editor";
 import { contrastRatio, resolvePalette } from "../theme/palette";
 import {
@@ -258,6 +260,35 @@ describe("editor palette tools", () => {
       light_colors: { wind: "#abcdef" },
     });
     editor.remove();
+  });
+
+  it("previews the palette being edited until the editor closes", async () => {
+    const card = document.createElement("weather-graph-card");
+    card.hass = { states: {}, config: {}, themes: { darkMode: true } } as unknown as HomeAssistant;
+    card.setConfig({ type: "custom:weather-graph-card", palette: "forest" });
+    card.samplePayload = SAMPLE_BOM_PROFILES[0].payload;
+    document.body.appendChild(card);
+    await card.updateComplete;
+    const bg = () =>
+      (card.shadowRoot!.querySelector(".wg-card") as HTMLElement).style.getPropertyValue("--wg-bg");
+    const forest = resolvePalette("forest", undefined).background;
+    const daylight = resolvePalette("daylight", undefined).background;
+    expect(bg()).toBe(forest);
+
+    const { editor, root } = await mountEditor({ palette: "forest" }, true);
+    root.querySelector<HTMLButtonElement>('.mode-btn[data-mode="light"]')!.click();
+    await card.updateComplete;
+    expect(bg()).toBe(daylight);
+
+    root.querySelector<HTMLButtonElement>('.mode-btn[data-mode="dark"]')!.click();
+    await card.updateComplete;
+    expect(bg()).toBe(forest);
+
+    root.querySelector<HTMLButtonElement>('.mode-btn[data-mode="light"]')!.click();
+    editor.remove();
+    await card.updateComplete;
+    expect(bg()).toBe(forest);
+    card.remove();
   });
 
   it("starts on the light palette when Home Assistant is in light mode", async () => {

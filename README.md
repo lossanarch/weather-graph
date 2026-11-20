@@ -72,7 +72,7 @@ light_colors:             # optional light mode overrides
   rain: "#1f6fb2"
 ```
 
-The card uses `palette`/`colors` when Home Assistant is in dark mode and `light_palette`/`light_colors` otherwise. Home Assistant follows your system's light/dark setting unless you choose otherwise under **Profile -> Theme**; without that information the card follows the browser's system setting. In the visual editor, the **Dark mode / Light mode** switch above the palette picker chooses which palette you're editing. The editor preview shows the palette for the mode you're currently in. To use one palette everywhere, pick the same palette in both modes.
+The card uses `palette`/`colors` when Home Assistant is in dark mode and `light_palette`/`light_colors` otherwise. Home Assistant follows your system's light/dark setting unless you choose otherwise under **Profile -> Theme**; without that information the card follows the browser's system setting. In the visual editor, the **Dark mode / Light mode** switch above the palette picker chooses which palette you're editing. While the editor is open, the preview shows whichever palette you've switched to. To use one palette everywhere, pick the same palette in both modes.
 
 `uv_time` shows the sun protection window for the selected hour's day, from the same BOM data as the `uv_start_time_0` / `uv_end_time_0` sensors. It reads `Not needed` when the UV index stays below 3. With other weather integrations it's worked out from the hourly UV index (3 or above), when the forecast covers that whole day.
 

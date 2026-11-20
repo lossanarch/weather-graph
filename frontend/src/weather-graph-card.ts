@@ -5,6 +5,7 @@ import { renderSummaryHeader } from "./components/summary-header";
 import "./editor/weather-graph-card-editor";
 import { renderWindLegendArrowHtml } from "./icons/weather-icons";
 import { buildThemeVars, resolveModePalette } from "./theme/palette";
+import { getPreviewPaletteMode, onPreviewPaletteModeChange } from "./theme/preview-mode";
 import type {
   CurrentObservation,
   HomeAssistant,
@@ -70,6 +71,7 @@ export class WeatherGraphCard extends LitElement {
   }
 
   private _darkQuery?: MediaQueryList;
+  private _unsubPreviewMode?: () => void;
   private readonly _onSchemeChange = (e: MediaQueryListEvent) => {
     this._prefersDark = e.matches;
   };
@@ -400,6 +402,7 @@ export class WeatherGraphCard extends LitElement {
       this._prefersDark = this._darkQuery.matches;
       this._darkQuery.addEventListener?.("change", this._onSchemeChange);
     }
+    this._unsubPreviewMode = onPreviewPaletteModeChange(() => this.requestUpdate());
     if (this.samplePayload) {
       this._payload = this.samplePayload;
       this._loading = false;
@@ -411,6 +414,8 @@ export class WeatherGraphCard extends LitElement {
   disconnectedCallback(): void {
     this._darkQuery?.removeEventListener?.("change", this._onSchemeChange);
     this._darkQuery = undefined;
+    this._unsubPreviewMode?.();
+    this._unsubPreviewMode = undefined;
     this._teardownSubscription();
     super.disconnectedCallback();
   }
@@ -594,7 +599,10 @@ export class WeatherGraphCard extends LitElement {
         : "";
 
     // HA's own dark mode follows the system unless the user overrides it in their profile.
-    const dark = this.hass?.themes?.darkMode ?? this._prefersDark;
+    const previewMode = getPreviewPaletteMode();
+    const dark = previewMode
+      ? previewMode === "dark"
+      : (this.hass?.themes?.darkMode ?? this._prefersDark);
     const themeVars = buildThemeVars(resolveModePalette(this._config, dark ? "dark" : "light"));
     const timeZone =
       this._payload?.location?.timezone ?? this.hass?.config?.time_zone ?? "Australia/Sydney";
