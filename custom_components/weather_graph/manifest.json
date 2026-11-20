@@ -1,0 +1,14 @@
+{
+  "domain": "weather_graph",
+  "name": "Weather Graph",
+  "codeowners": ["@lossanarch"],
+  "config_flow": true,
+  "dependencies": ["http", "frontend", "lovelace"],
+  "after_dependencies": ["bureau_of_meteorology"],
+  "documentation": "https://github.com/lossanarch/weather-graph",
+  "integration_type": "helper",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/lossanarch/weather-graph/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}
