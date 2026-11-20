@@ -17,7 +17,7 @@ Designed to pair natively with the Australian [**Bureau of Meteorology (`bremor/
     - **Chance Rain**: Smooth monotone cubic filled area (`0–100%` plot height).
     - **Wind**: Wind speed curve + hourly directional wind-flow vector arrows (right `km/h` scale).
     - Hiding temperature or wind hands that axis to the rain `%` scale.
-- **Colour Palettes**: Five built-in palettes (Dusk, Midnight, Forest, Ember, Daylight), each with six editable colours and a one-click revert.
+- **Colour Palettes**: Five built-in palettes (Dusk, Midnight, Forest, Ember, Daylight), each with six editable colours and a one-click revert. Paste a palette from any generator, then drag swatches to swap colours.
 - **Zero Manual Resource Setup**: Serves the bundled ES module via Home Assistant's async static HTTP API and automatically registers it in Lovelace resources (falls back to a frontend extra module when resources are managed in YAML).
 
 ---
@@ -70,6 +70,27 @@ colors:             # optional overrides on top of the palette
 ```
 
 `colors` accepts `background`, `daytime`, `temperature`, `rain`, `wind` and `text` as hex values. Other shades (panels, night shading, grid lines) are derived from these, so light backgrounds work too.
+
+### Paste a Palette
+
+The **Paste a Palette** box under the colour swatches in the visual editor accepts any of these (Ctrl/⌘+Enter applies):
+
+| Format | Example |
+| --- | --- |
+| CSV | `c7eae4,a7e8bd,fcbcb8,efa7a7,ffd972` |
+| CSV with `#` | `#c7eae4, #a7e8bd, #fcbcb8, #efa7a7, #ffd972` |
+| JSON array | `["c7eae4","a7e8bd","fcbcb8","efa7a7","ffd972"]` |
+| JSON object, keyed by slot | `{"background":"264653","rain":"2a9d8f"}` |
+| JSON object, keyed by colour names | `{"Mint":"c7eae4","Celadon":"a7e8bd", ...}` (read in order) |
+| Anything with hex codes | `https://coolors.co/264653-2a9d8f-e9c46a-f4a261-e76f51` |
+
+How the colours are used:
+
+- **Keyed by slot:** only the named slots change. If you set `background` without `text`, a readable text colour is generated.
+- **Exactly six colours:** they fill the slots in order: background, daytime shading, temperature, rain, wind, text.
+- **Any other number (typically five):** colours are assigned automatically. The background is whichever colour keeps the others most legible. Temperature gets the warmest hue and rain the bluest, wind takes what's left. Daytime shading uses a pasted colour only if it's close to the background; otherwise it's a shade of the background. Text is generated to contrast with the background.
+
+Then drag a swatch's handle onto another swatch to swap the two colours, or tap two handles in turn. Temperature, rain or wind colours that will be hard to see against the background get a **low contrast** marker. **Copy current** copies the six colours as CSV, so you can share a palette or paste it back later.
 
 ### Optional Sensor Overrides (Current Hour Header)
 
