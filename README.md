@@ -16,7 +16,7 @@ Designed to pair natively with the Australian [**Bureau of Meteorology (`bremor/
     - **Temperature**: Smooth monotone cubic spline curve (left `°C` scale).
     - **Chance Rain**: Smooth monotone cubic filled area (`0–100%` plot height).
     - **Wind**: Wind speed curve + hourly directional wind-flow vector arrows (right `km/h` scale).
-- **Zero Manual Resource Setup**: Serves the bundled ES module via Home Assistant's async static HTTP API and automatically registers it in Lovelace resources (`storage` and `yaml` dashboard modes supported).
+- **Zero Manual Resource Setup**: Serves the bundled ES module via Home Assistant's async static HTTP API and automatically registers it in Lovelace resources (falls back to a frontend extra module when resources are managed in YAML).
 
 ---
 
@@ -39,6 +39,8 @@ When `bremor/bureau_of_meteorology` is installed, `weather_graph` hooks directly
 4. **Restart Home Assistant**.
 5. Go to **Settings -> Devices & Services -> + Add Integration** and add **Weather Graph**.
 6. Edit any Dashboard -> **Add Card** -> choose **Weather Graph** from the visual card picker.
+
+If a dashboard shows `Custom element doesn't exist: weather-graph-card`, check **Settings -> Dashboards -> top-right menu -> Resources** for `/weather_graph/weather-graph-card.js?v=<version>` as a **JavaScript module**. The integration adds it on startup; if it is missing, add it there manually and reload the page.
 
 ---
 

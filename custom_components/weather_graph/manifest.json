@@ -6,9 +6,9 @@
   "dependencies": ["http", "frontend", "lovelace"],
   "after_dependencies": ["bureau_of_meteorology"],
   "documentation": "https://github.com/lossanarch/weather-graph",
-  "integration_type": "helper",
+  "integration_type": "service",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/lossanarch/weather-graph/issues",
   "requirements": [],
-  "version": "1.0.0"
+  "version": "1.0.1"
 }

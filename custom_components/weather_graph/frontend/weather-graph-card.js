@@ -2080,7 +2080,7 @@ customElements.get("weather-graph-card-editor") || customElements.define(
   "weather-graph-card-editor",
   $t
 );
-const Fe = "1.0.0", lt = class lt extends U {
+const Fe = "1.0.1", lt = class lt extends U {
   constructor() {
     super(), this._subscribedKey = "", this._subscribing = !1, this._config = {
       type: "custom:weather-graph-card",

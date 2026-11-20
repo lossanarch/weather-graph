@@ -1,6 +1,6 @@
 [project]
 name = "ha-weather-graph"
-version = "1.0.0"
+version = "1.0.1"
 description = "Home Assistant HACS integration and Lovelace card rendering an interactive 48-hour forecast graph powered by Bureau of Meteorology (BOM) or any HA weather entity."
 readme = "README.md"
 requires-python = ">=3.11"

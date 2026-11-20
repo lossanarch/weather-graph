@@ -16,7 +16,7 @@ import {
   resolveWeatherEntityId,
 } from "./utils/forecast-utils";
 
-const CARD_VERSION = "1.0.0";
+const CARD_VERSION = "1.0.1";
 
 export class WeatherGraphCard extends LitElement {
   static properties: PropertyDeclarations = {

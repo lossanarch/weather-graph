@@ -10,22 +10,23 @@ from urllib.parse import parse_qs, urlparse
 from homeassistant.components.frontend import add_extra_js_url
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.event import async_call_later
 
-from .const import CARD_FILENAME, URL_BASE
+from .const import CARD_FILENAME, DOMAIN, URL_BASE
 
 _LOGGER = logging.getLogger(__name__)
 
 MANIFEST_PATH = Path(__file__).parent / "manifest.json"
 FRONTEND_DIR = Path(__file__).parent / "frontend"
 
+_REGISTERED_KEY = "frontend_registered"
+
 
 def _read_integration_version() -> str:
     try:
         data = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
-        return str(data.get("version", "1.0.0"))
+        return str(data.get("version", "0"))
     except (OSError, ValueError):
-        return "1.0.0"
+        return "0"
 
 
 def _extract_path_and_version(resource_url: str) -> tuple[str, str | None]:
@@ -35,17 +36,69 @@ def _extract_path_and_version(resource_url: str) -> tuple[str, str | None]:
 
 
 def _get_lovelace_mode_and_resources(hass: HomeAssistant) -> tuple[str | None, Any]:
-    """Support both HA 2026+ LovelaceData attributes and legacy dict access."""
+    """Read the Lovelace resource mode and collection across HA versions.
+
+    HA < 2025.2 stores a dict, 2025.2-2026.1 a LovelaceData with `mode`, and
+    2026.2+ renamed that attribute to `resource_mode`.
+    """
     lovelace = hass.data.get("lovelace")
     if lovelace is None:
         return None, None
     if isinstance(lovelace, dict):
-        return lovelace.get("mode"), lovelace.get("resources")
-    return getattr(lovelace, "mode", None), getattr(lovelace, "resources", None)
+        return lovelace.get("resource_mode") or lovelace.get("mode"), lovelace.get(
+            "resources"
+        )
+    mode = getattr(lovelace, "resource_mode", None) or getattr(lovelace, "mode", None)
+    return mode, getattr(lovelace, "resources", None)
+
+
+async def _async_ensure_resources_loaded(resources: Any) -> None:
+    """Load the resource storage collection, which HA loads lazily."""
+    if getattr(resources, "loaded", True):
+        return
+    ensure_loaded = getattr(resources, "_async_ensure_loaded", None)
+    if ensure_loaded is not None:
+        await ensure_loaded()
+        return
+    await resources.async_load()
+    resources.loaded = True
+
+
+async def _async_upsert_lovelace_resource(
+    resources: Any, card_path: str, versioned_url: str, version: str
+) -> None:
+    await _async_ensure_resources_loaded(resources)
+
+    matching = [
+        item
+        for item in resources.async_items()
+        if isinstance(item.get("url"), str)
+        and _extract_path_and_version(item["url"])[0] == card_path
+    ]
+
+    if not matching:
+        await resources.async_create_item({"res_type": "module", "url": versioned_url})
+        _LOGGER.info("Registered Lovelace resource %s", versioned_url)
+        return
+
+    first, *duplicates = matching
+    if _extract_path_and_version(first["url"])[1] != version or first.get("type") != "module":
+        await resources.async_update_item(
+            first["id"], {"res_type": "module", "url": versioned_url}
+        )
+        _LOGGER.info("Updated Lovelace resource %s to v%s", card_path, version)
+    for item in duplicates:
+        await resources.async_delete_item(item["id"])
+        _LOGGER.info("Removed duplicate Lovelace resource %s", item["url"])
 
 
 async def async_register_frontend(hass: HomeAssistant) -> None:
     """Serve the bundled card JS and register it as a Lovelace module resource."""
+    domain_data = hass.data.setdefault(DOMAIN, {})
+    if domain_data.get(_REGISTERED_KEY):
+        return
+    domain_data[_REGISTERED_KEY] = True
+
     version = await hass.async_add_executor_job(_read_integration_version)
     card_path = f"{URL_BASE}/{CARD_FILENAME}"
     versioned_url = f"{card_path}?v={version}"
@@ -59,36 +112,23 @@ async def async_register_frontend(hass: HomeAssistant) -> None:
         _LOGGER.debug("Static path %s already registered", URL_BASE)
 
     mode, resources = _get_lovelace_mode_and_resources(hass)
-    if mode != "storage" or resources is None:
-        add_extra_js_url(hass, versioned_url)
-        _LOGGER.debug("Registered extra JS URL for YAML Lovelace mode: %s", versioned_url)
-        return
-
-    async def _ensure_lovelace_resource(_now: Any = None) -> None:
-        if not getattr(resources, "loaded", True):
-            async_call_later(hass, 3, _ensure_lovelace_resource)
+    if mode == "storage" and resources is not None:
+        try:
+            await _async_upsert_lovelace_resource(
+                resources, card_path, versioned_url, version
+            )
             return
-
-        existing = [
-            item
-            for item in resources.async_items()
-            if isinstance(item.get("url"), str) and item["url"].startswith(URL_BASE)
-        ]
-
-        for item in existing:
-            path, item_ver = _extract_path_and_version(item["url"])
-            if path == card_path:
-                if item_ver != version:
-                    await resources.async_update_item(
-                        item["id"],
-                        {"res_type": "module", "url": versioned_url},
-                    )
-                    _LOGGER.info("Updated Lovelace resource %s to v%s", card_path, version)
-                return
-
-        await resources.async_create_item(
-            {"res_type": "module", "url": versioned_url}
+        except Exception:  # noqa: BLE001
+            _LOGGER.exception(
+                "Could not register Lovelace resource %s; loading it as an extra module",
+                versioned_url,
+            )
+    else:
+        _LOGGER.info(
+            "Lovelace resources are in %s mode; loading %s as an extra module. "
+            "You can also add it under your Lovelace resources as a JavaScript module",
+            mode or "unknown",
+            versioned_url,
         )
-        _LOGGER.info("Registered Lovelace resource %s", versioned_url)
 
-    await _ensure_lovelace_resource()
+    add_extra_js_url(hass, versioned_url)
