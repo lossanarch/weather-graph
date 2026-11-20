@@ -141,9 +141,7 @@ describe("weather-graph-card custom element", () => {
     await el.updateComplete;
 
     const shadow = el.shadowRoot!;
-    expect(shadow.querySelector(".wg-card-title")?.textContent).toBe(
-      "Next 48 Hours"
-    );
+    expect(shadow.querySelector(".wg-card-title")?.textContent).toBe("Weather");
     expect(shadow.querySelector(".wg-summary-temp")?.textContent?.trim()).toBe(
       "24°"
     );

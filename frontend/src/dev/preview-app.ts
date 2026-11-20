@@ -109,7 +109,6 @@ export class WgPreviewWorkbench extends LitElement {
     this._cardConfig = {
       type: "custom:weather-graph-card",
       entity: SAMPLE_BOM_PROFILES[0].hourlyEntityId,
-      title: "Next 48 Hours",
       hours_to_show: 48,
       visible_hours: 24,
       show_temperature: true,
@@ -289,7 +288,10 @@ export class WgPreviewWorkbench extends LitElement {
       "type: custom:weather-graph-card",
       `entity: ${this._cardConfig.entity || "weather.sydney_hourly"}`,
     ];
-    if (this._cardConfig.title && this._cardConfig.title !== "Next 48 Hours") {
+    if (this._cardConfig.show_title === false) {
+      lines.push("show_title: false");
+    }
+    if (this._cardConfig.title) {
       lines.push(`title: "${this._cardConfig.title}"`);
     }
     if (this._cardConfig.hours_to_show && this._cardConfig.hours_to_show !== 48) {

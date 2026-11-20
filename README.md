@@ -53,13 +53,14 @@ All options can be configured in the **Lovelace Visual Card Editor** or via YAML
 ```yaml
 type: custom:weather-graph-card
 entity: weather.sydney_hourly
-title: Next 48 Hours
+title: Weather           # default "Weather"
+show_title: true         # set false to hide the title
 hours_to_show: 48
 visible_hours: 24
 show_temperature: true
 show_rain: true
 show_wind: true
-show_location: false
+show_location: false     # location name as a subtitle
 metrics:            # up to 3: wind, wind_gust, humidity, dew_point, feels_like, uv, uv_time, rain_amount
   - wind
   - humidity
@@ -75,6 +76,8 @@ light_colors:             # optional light mode overrides
 The card uses `palette`/`colors` when Home Assistant is in dark mode and `light_palette`/`light_colors` otherwise. Home Assistant follows your system's light/dark setting unless you choose otherwise under **Profile -> Theme**; without that information the card follows the browser's system setting. In the visual editor, the **Dark mode / Light mode** switch above the palette picker chooses which palette you're editing. While the editor is open, the preview shows whichever palette you've switched to. To use one palette everywhere, pick the same palette in both modes.
 
 `uv_time` shows the sun protection window for the selected hour's day, from the same BOM data as the `uv_start_time_0` / `uv_end_time_0` sensors. It reads `Not needed` when the UV index stays below 3. With other weather integrations it's worked out from the hourly UV index (3 or above), when the forecast covers that whole day.
+
+With `show_title: false` and `show_location: false` there's no header row at all, and the card gets shorter to match.
 
 `colors` and `light_colors` accept `background`, `daytime`, `temperature`, `rain`, `wind` and `text` as hex values. Other shades (panels, night shading, grid lines) are derived from these, so light backgrounds work too.
 

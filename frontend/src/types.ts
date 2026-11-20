@@ -21,6 +21,7 @@ export interface WeatherGraphCardConfig {
   entity?: string;
   bom_entry_id?: string;
   title?: string;
+  show_title?: boolean;
   hours_to_show?: number;
   visible_hours?: number;
   show_temperature?: boolean;

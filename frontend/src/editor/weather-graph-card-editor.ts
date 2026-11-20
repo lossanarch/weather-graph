@@ -14,6 +14,7 @@ import {
 import { assignPaletteColors, paletteToCsv, parsePaletteInput } from "../theme/palette-import";
 import { setPreviewPaletteMode } from "../theme/preview-mode";
 import type { HomeAssistant, SummaryMetric, WeatherGraphCardConfig } from "../types";
+import { DEFAULT_TITLE } from "../constants";
 import {
   MAX_SUMMARY_METRICS,
   SUMMARY_METRIC_OPTIONS,
@@ -107,6 +108,17 @@ export class WeatherGraphCardEditor extends LitElement {
       background: var(--card-background-color, #0f172a);
       color: var(--primary-text-color, #f8fafc);
       font-size: 14px;
+    }
+
+    .title-row {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .title-row input[type="text"]:disabled {
+      opacity: 0.5;
     }
 
     .row-2 {
@@ -768,6 +780,7 @@ export class WeatherGraphCardEditor extends LitElement {
   }
 
   render() {
+    const showTitle = this._config.show_title !== false;
     const weatherEntities = Object.keys(this.hass?.states ?? {})
       .filter((id) => id.startsWith("weather."))
       .sort((a, b) => {
@@ -804,14 +817,43 @@ export class WeatherGraphCardEditor extends LitElement {
         </div>
 
         <div class="field">
-          <label for="wg-title">Card Title</label>
-          <input
-            id="wg-title"
-            type="text"
-            .value=${this._config.title ?? "Next 48 Hours"}
-            @input=${(e: Event) =>
-              this._update("title", (e.target as HTMLInputElement).value)}
-          />
+          <label for="wg-title">Header</label>
+          <div class="title-row">
+            <label class="toggle-item">
+              <input
+                type="checkbox"
+                id="wg-show-title"
+                .checked=${showTitle}
+                @change=${(e: Event) =>
+                  this._update(
+                    "show_title",
+                    (e.target as HTMLInputElement).checked ? undefined : false
+                  )}
+              />
+              Title
+            </label>
+            <input
+              id="wg-title"
+              type="text"
+              aria-label="Title text"
+              placeholder=${DEFAULT_TITLE}
+              ?disabled=${!showTitle}
+              .value=${this._config.title ?? ""}
+              @input=${(e: Event) =>
+                this._update("title", (e.target as HTMLInputElement).value || undefined)}
+            />
+          </div>
+          <label class="toggle-item">
+            <input
+              type="checkbox"
+              id="wg-show-location"
+              .checked=${Boolean(this._config.show_location)}
+              @change=${(e: Event) =>
+                this._update("show_location", (e.target as HTMLInputElement).checked)}
+            />
+            Location subtitle
+          </label>
+          <span class="hint">Turn both off to drop the header row and make the card shorter.</span>
         </div>
 
         <div class="row-2">
@@ -879,15 +921,6 @@ export class WeatherGraphCardEditor extends LitElement {
                   this._update("show_wind", (e.target as HTMLInputElement).checked)}
               />
               Wind
-            </label>
-            <label class="toggle-item">
-              <input
-                type="checkbox"
-                .checked=${Boolean(this._config.show_location)}
-                @change=${(e: Event) =>
-                  this._update("show_location", (e.target as HTMLInputElement).checked)}
-              />
-              Location Subtitle
             </label>
           </div>
         </div>

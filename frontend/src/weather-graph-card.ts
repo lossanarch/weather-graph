@@ -2,6 +2,7 @@ import { LitElement, type PropertyDeclarations, css, html, nothing } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import "./components/forecast-chart";
 import { renderSummaryHeader } from "./components/summary-header";
+import { DEFAULT_TITLE } from "./constants";
 import "./editor/weather-graph-card-editor";
 import { renderWindLegendArrowHtml } from "./icons/weather-icons";
 import { buildThemeVars, resolveModePalette } from "./theme/palette";
@@ -53,7 +54,6 @@ export class WeatherGraphCard extends LitElement {
     super();
     this._config = {
       type: "custom:weather-graph-card",
-      title: "Next 48 Hours",
       hours_to_show: 48,
       visible_hours: 24,
       show_temperature: true,
@@ -110,6 +110,11 @@ export class WeatherGraphCard extends LitElement {
       font-weight: 700;
       letter-spacing: -0.01em;
       color: var(--wg-text);
+    }
+
+    .wg-no-header .wg-summary-panel,
+    .wg-no-header .wg-skeleton {
+      margin-top: 14px;
     }
 
     .wg-card-subtitle {
@@ -360,7 +365,6 @@ export class WeatherGraphCard extends LitElement {
     return {
       type: "custom:weather-graph-card",
       entity: resolved ?? undefined,
-      title: "Next 48 Hours",
       hours_to_show: 48,
       visible_hours: 24,
       show_temperature: true,
@@ -374,7 +378,6 @@ export class WeatherGraphCard extends LitElement {
       throw new Error("Invalid Weather Graph Card configuration.");
     }
     this._config = {
-      title: "Next 48 Hours",
       hours_to_show: 48,
       visible_hours: 24,
       show_temperature: true,
@@ -392,7 +395,8 @@ export class WeatherGraphCard extends LitElement {
   }
 
   public getCardSize(): number {
-    return 7;
+    const hasHeader = this._config.show_title !== false || Boolean(this._config.show_location);
+    return hasHeader ? 7 : 6;
   }
 
   connectedCallback(): void {
@@ -584,7 +588,8 @@ export class WeatherGraphCard extends LitElement {
   }
 
   render() {
-    const title = this._config.title || "Next 48 Hours";
+    const showTitle = this._config.show_title !== false;
+    const title = this._config.title?.trim() || DEFAULT_TITLE;
     const hours = this._payload?.hourly ?? [];
     const selectedPoint =
       hours[Math.max(0, Math.min(hours.length - 1, this._selectedIndex))] ??
@@ -597,6 +602,7 @@ export class WeatherGraphCard extends LitElement {
               : ""
           }`
         : "";
+    const hasHeader = showTitle || Boolean(locationLabel);
 
     // HA's own dark mode follows the system unless the user overrides it in their profile.
     const previewMode = getPreviewPaletteMode();
@@ -609,13 +615,17 @@ export class WeatherGraphCard extends LitElement {
     const metrics = normalizeSummaryMetrics(this._config.metrics);
 
     return html`
-      <div class="wg-card" style=${styleMap(themeVars)}>
-        <div class="wg-card-header">
-          <h2 class="wg-card-title">${title}</h2>
-          ${locationLabel
-            ? html`<span class="wg-card-subtitle">${locationLabel}</span>`
-            : nothing}
-        </div>
+      <div class="wg-card ${hasHeader ? "" : "wg-no-header"}" style=${styleMap(themeVars)}>
+        ${hasHeader
+          ? html`
+              <div class="wg-card-header">
+                ${showTitle ? html`<h2 class="wg-card-title">${title}</h2>` : nothing}
+                ${locationLabel
+                  ? html`<span class="wg-card-subtitle">${locationLabel}</span>`
+                  : nothing}
+              </div>
+            `
+          : nothing}
 
         ${this._loading
           ? html`<div class="wg-skeleton" aria-label="Loading forecast"></div>`

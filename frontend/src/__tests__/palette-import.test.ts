@@ -291,6 +291,27 @@ describe("editor palette tools", () => {
     card.remove();
   });
 
+  it("edits the title and its toggle", async () => {
+    const { editor, root, changes } = await mountEditor({ title: "Old" });
+    const title = root.querySelector<HTMLInputElement>("#wg-title")!;
+    expect(title.placeholder).toBe("Weather");
+    title.value = "";
+    title.dispatchEvent(new Event("input"));
+    expect("title" in changes.at(-1)!).toBe(false);
+
+    const toggle = root.querySelector<HTMLInputElement>("#wg-show-title")!;
+    toggle.checked = false;
+    toggle.dispatchEvent(new Event("change"));
+    await editor.updateComplete;
+    expect(changes.at(-1)?.show_title).toBe(false);
+    expect(root.querySelector<HTMLInputElement>("#wg-title")!.disabled).toBe(true);
+
+    toggle.checked = true;
+    toggle.dispatchEvent(new Event("change"));
+    expect("show_title" in changes.at(-1)!).toBe(false);
+    editor.remove();
+  });
+
   it("starts on the light palette when Home Assistant is in light mode", async () => {
     const { editor, root } = await mountEditor({}, false);
     expect(root.querySelector('.mode-btn[aria-pressed="true"]')?.getAttribute("data-mode")).toBe(

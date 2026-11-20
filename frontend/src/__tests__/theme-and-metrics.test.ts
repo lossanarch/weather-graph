@@ -210,6 +210,29 @@ describe("card theming, fields and axes", () => {
     el.remove();
   });
 
+  it("toggles the title and subtitle, dropping the header when both are off", async () => {
+    const both = await mountCard({ title: "Back yard", show_location: true });
+    expect(both.shadow.querySelector(".wg-card-title")?.textContent).toBe("Back yard");
+    expect(both.shadow.querySelector(".wg-card-subtitle")?.textContent).toBe("Sydney, NSW");
+    expect(both.el.getCardSize()).toBe(7);
+    both.el.remove();
+
+    const subtitleOnly = await mountCard({ show_title: false, show_location: true });
+    expect(subtitleOnly.shadow.querySelector(".wg-card-title")).toBeNull();
+    expect(subtitleOnly.shadow.querySelector(".wg-card-subtitle")).not.toBeNull();
+    subtitleOnly.el.remove();
+
+    const none = await mountCard({ show_title: false, title: "Hidden" });
+    expect(none.shadow.querySelector(".wg-card-header")).toBeNull();
+    expect(none.shadow.querySelector(".wg-card")!.classList.contains("wg-no-header")).toBe(true);
+    expect(none.el.getCardSize()).toBe(6);
+    none.el.remove();
+
+    const blank = await mountCard({ title: "  " });
+    expect(blank.shadow.querySelector(".wg-card-title")?.textContent).toBe("Weather");
+    blank.el.remove();
+  });
+
   it("moves the rain scale onto the axis of a hidden series", async () => {
     const { el, chart } = await mountCard({});
     const axisUnits = () =>
