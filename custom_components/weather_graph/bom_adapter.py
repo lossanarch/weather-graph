@@ -228,6 +228,7 @@ def build_bom_forecast_payload(
     location_state = locations_raw.get("state")
 
     sun_windows: list[dict[str, Any]] = []
+    uv_windows: list[dict[str, Any]] = []
     daily_raw = (getattr(collector, "daily_forecasts_data", None) or {}).get("data") or []
     for day_row in daily_raw:
         if not isinstance(day_row, Mapping):
@@ -249,6 +250,9 @@ def build_bom_forecast_payload(
                     "sunset_ms": int(sunset_dt.timestamp() * 1000) if sunset_dt else None,
                 }
             )
+        uv_window = _build_uv_window(day_row, tz)
+        if uv_window:
+            uv_windows.append(uv_window)
 
     obs_raw = (getattr(collector, "observations_data", None) or {}).get("data") or {}
     current_obs: dict[str, Any] | None = None
@@ -367,7 +371,34 @@ def build_bom_forecast_payload(
         },
         "current": current_obs,
         "sun_windows": sun_windows,
+        "uv_windows": uv_windows,
         "hourly": hours,
+    }
+
+
+def _build_uv_window(day_row: Mapping[str, Any], tz: ZoneInfo) -> dict[str, Any] | None:
+    """Sun protection times for one BOM daily row (the `uv_start_time_0` style sensors).
+
+    BOM omits the times on days when the UV index stays below 3, so a row with a
+    max index but no times means no protection is needed rather than missing data.
+    """
+    start_dt = _parse_iso_datetime(
+        _extract_nested_or_flat(day_row, "uv_start_time", "uv", "start_time"), tz
+    )
+    end_dt = _parse_iso_datetime(
+        _extract_nested_or_flat(day_row, "uv_end_time", "uv", "end_time"), tz
+    )
+    max_index = _safe_float(_extract_nested_or_flat(day_row, "uv_max_index", "uv", "max_index"))
+    day_dt = _parse_iso_datetime(day_row.get("date"), tz) or start_dt
+    if day_dt is None or (start_dt is None and end_dt is None and max_index is None):
+        return None
+    return {
+        "date": day_dt.date().isoformat(),
+        "start": start_dt.isoformat() if start_dt else None,
+        "start_ms": int(start_dt.timestamp() * 1000) if start_dt else None,
+        "end": end_dt.isoformat() if end_dt else None,
+        "end_ms": int(end_dt.timestamp() * 1000) if end_dt else None,
+        "max_index": max_index,
     }
 
 

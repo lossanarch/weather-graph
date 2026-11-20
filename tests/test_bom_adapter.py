@@ -77,16 +77,26 @@ def _make_mock_bom_collector(flattened: bool = True) -> SimpleNamespace:
                 {
                     "astronomical_sunrise_time": "2026-11-19T18:41:00Z",
                     "astronomical_sunset_time": "2026-11-20T08:42:00Z",
+                    "uv_start_time": "2026-11-19T22:10:00Z",
+                    "uv_end_time": "2026-11-20T05:00:00Z",
+                    "uv_max_index": 10,
                 }
                 if flattened
                 else {
                     "astronomical": {
                         "sunrise_time": "2026-11-19T18:41:00Z",
                         "sunset_time": "2026-11-20T08:42:00Z",
-                    }
+                    },
+                    "uv": {
+                        "start_time": "2026-11-19T22:10:00Z",
+                        "end_time": "2026-11-20T05:00:00Z",
+                        "max_index": 10,
+                    },
                 }
             ),
-        }
+        },
+        {"date": "2026-11-20T13:00:00Z", "uv_max_index": 2, "uv_start_time": None},
+        {"date": "2026-11-21T13:00:00Z"},
     ]
 
     observations = {
@@ -215,6 +225,25 @@ def test_build_bom_forecast_payload_flattened_and_nested() -> None:
 
         assert payload["hourly"][10]["is_night"] is True
         assert payload["hourly"][10]["icon_descriptor"] == "clear"
+
+        assert payload["uv_windows"] == [
+            {
+                "date": "2026-11-20",
+                "start": "2026-11-20T09:10:00+11:00",
+                "start_ms": int(datetime(2026, 11, 19, 22, 10, tzinfo=timezone.utc).timestamp() * 1000),
+                "end": "2026-11-20T16:00:00+11:00",
+                "end_ms": int(datetime(2026, 11, 20, 5, 0, tzinfo=timezone.utc).timestamp() * 1000),
+                "max_index": 10.0,
+            },
+            {
+                "date": "2026-11-21",
+                "start": None,
+                "start_ms": None,
+                "end": None,
+                "end_ms": None,
+                "max_index": 2.0,
+            },
+        ]
 
 
 def test_build_generic_ha_forecast_payload_unit_conversion() -> None:
