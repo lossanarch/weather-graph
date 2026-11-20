@@ -168,6 +168,33 @@ export function relativeLuminance(hex: string): number {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
+/** WCAG contrast ratio, from 1 (identical) to 21 (black on white). */
+export function contrastRatio(a: string, b: string): number {
+  const la = relativeLuminance(a);
+  const lb = relativeLuminance(b);
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+}
+
+/** Hue in degrees (0-360); greys report 0. */
+export function hexToHue(hex: string): number {
+  const [r, g, b] = toRgb(hex).map((c) => c / 255);
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const delta = max - min;
+  if (delta === 0) return 0;
+  let h: number;
+  if (max === r) h = ((g - b) / delta) % 6;
+  else if (max === g) h = (b - r) / delta + 2;
+  else h = (r - g) / delta + 4;
+  return (h * 60 + 360) % 360;
+}
+
+/** Chroma from 0 to 1; near-zero values are greys whose hue is meaningless. */
+export function chroma(hex: string): number {
+  const rgb = toRgb(hex);
+  return (Math.max(...rgb) - Math.min(...rgb)) / 255;
+}
+
 /** CSS custom properties consumed by the card, chart and icons. */
 export function buildThemeVars(colors: PaletteColors): Record<string, string> {
   const { background: bg, daytime, temperature, rain, wind, text } = colors;
