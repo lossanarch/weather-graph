@@ -1,4 +1,4 @@
-import { LitElement, type PropertyDeclarations, css, html, svg } from "lit";
+import { LitElement, type PropertyDeclarations, css, html } from "lit";
 import {
   DEFAULT_PALETTE_ID,
   PALETTE_PRESETS,
@@ -524,10 +524,11 @@ export class WeatherGraphCardEditor extends LitElement {
           }}
         >
           <svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true">
-            ${[3, 8, 13].map(
-              (cy) => svg`<circle cx="2.5" cy=${cy} r="1.5" fill="currentColor" />
-                <circle cx="7.5" cy=${cy} r="1.5" fill="currentColor" />`
-            )}
+            <g fill="currentColor">
+              <circle cx="2.5" cy="3" r="1.5" /><circle cx="7.5" cy="3" r="1.5" />
+              <circle cx="2.5" cy="8" r="1.5" /><circle cx="7.5" cy="8" r="1.5" />
+              <circle cx="2.5" cy="13" r="1.5" /><circle cx="7.5" cy="13" r="1.5" />
+            </g>
           </svg>
         </button>
         <input
