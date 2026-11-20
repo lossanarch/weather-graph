@@ -9,11 +9,6 @@ BOM_DOMAIN: Final[str] = "bureau_of_meteorology"
 URL_BASE: Final[str] = "/weather_graph"
 CARD_FILENAME: Final[str] = "weather-graph-card.js"
 
-CONF_DEFAULT_ENTITY: Final[str] = "default_entity"
-CONF_TITLE: Final[str] = "title"
-CONF_HOURS: Final[str] = "hours_to_show"
-
-DEFAULT_TITLE: Final[str] = "Next 48 Hours"
 DEFAULT_HOURS: Final[int] = 48
 
 CARDINAL_TO_DEGREES: Final[dict[str, float]] = {

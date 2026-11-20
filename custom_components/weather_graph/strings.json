@@ -3,28 +3,12 @@
     "step": {
       "user": {
         "title": "Set up Weather Graph",
-        "description": "Registers the Next 48 Hours Lovelace weather graph card and connects to your Bureau of Meteorology (BOM) or Home Assistant hourly weather entity.",
-        "data": {
-          "title": "Default card title",
-          "hours_to_show": "Forecast horizon (hours)",
-          "default_entity": "Default hourly weather entity"
-        }
+        "description": "Serves the Weather Graph dashboard card and streams hourly forecasts to it from Bureau of Meteorology (BOM) or any Home Assistant weather entity. There is nothing to configure here: choose the entity, colours and fields on each card."
       }
     },
     "abort": {
-      "already_configured": "Weather Graph is already configured."
-    }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "Weather Graph Options",
-        "data": {
-          "title": "Default card title",
-          "hours_to_show": "Forecast horizon (hours)",
-          "default_entity": "Default hourly weather entity"
-        }
-      }
+      "already_configured": "Weather Graph is already set up.",
+      "single_instance_allowed": "Weather Graph is already set up."
     }
   }
 }
