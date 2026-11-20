@@ -21,7 +21,7 @@ import {
 } from "./utils/forecast-utils";
 import { normalizeSummaryMetrics, resolveUvTimes } from "./utils/summary-metrics";
 
-const CARD_VERSION = "1.3.1";
+const CARD_VERSION = "1.4.0";
 
 export class WeatherGraphCard extends LitElement {
   static properties: PropertyDeclarations = {
