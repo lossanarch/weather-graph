@@ -139,3 +139,30 @@ cd frontend && npm test
 # Run Python backend integration tests
 python3 -m pytest
 ```
+
+## Releasing
+
+`scripts/release.py` cuts a release using [semantic versioning](https://semver.org). It:
+
+1. Bumps the version everywhere it's recorded: `manifest.json`, `pyproject.toml`, `frontend/package.json`, `frontend/package-lock.json`, and `CARD_VERSION` in the card. The card's version is what busts the browser cache.
+2. Rebuilds the card bundle and runs the Vitest and pytest suites. If anything fails, it reverts the bump.
+3. Commits `chore: release X.Y.Z` and creates an annotated `vX.Y.Z` tag. The tag's release notes are grouped from the `feat:`/`fix:` commit subjects since the last release.
+4. Pushes the branch and tag together. If the [GitHub CLI](https://cli.github.com) (`gh`) is installed and signed in, it also publishes a GitHub release, which is what HACS uses to offer versions.
+
+```bash
+python3 scripts/release.py minor --dry-run   # preview: 1.4.0 -> 1.5.0 and the release notes
+python3 scripts/release.py patch             # 1.4.0 -> 1.4.1
+python3 scripts/release.py minor             # 1.4.1 -> 1.5.0
+python3 scripts/release.py major --pre rc    # 1.5.0 -> 2.0.0-rc.1 (published as a prerelease)
+python3 scripts/release.py prerelease        # 2.0.0-rc.1 -> 2.0.0-rc.2
+python3 scripts/release.py major             # 2.0.0-rc.2 -> 2.0.0 (finalises the prerelease)
+python3 scripts/release.py 2.1.0             # any explicit version newer than the current one
+```
+
+It only runs from a clean `main` that's up to date with `origin`, and asks for confirmation before changing anything. Other options:
+
+- `--no-push` commits and tags locally only.
+- `--skip-tests` still rebuilds the bundle but skips the test suites.
+- `--remote NAME` pushes to a remote other than `origin`.
+- `--no-github-release` skips publishing the GitHub release.
+- `-y` skips the confirmation prompt.
